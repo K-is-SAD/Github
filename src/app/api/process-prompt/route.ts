@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
       );
     }
  
-    const scriptPath = path.resolve(process.cwd(), 'C:/Users/sayan/OneDrive/Desktop/Github/src/LLM/agent.py');
+    const scriptPath = path.resolve(process.cwd(), 'src/LLM/agent.py');
     const pythonProcess = spawn('python', [scriptPath, githubUrl]);
     
     let output = '';
