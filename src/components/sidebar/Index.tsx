@@ -88,9 +88,9 @@ const Dashboard = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ githubUrl: repoUrl }),
       });
-      
+
       const data = await apiResponse.json();
-      
+
       if (!apiResponse.ok) {
         throw new Error(data.error || "Failed to process request");
       }
@@ -112,7 +112,7 @@ const Dashboard = () => {
 
   const handleCopy = () => {
     if (!response || response === "Processing your request...") return;
-    
+
     navigator.clipboard.writeText(response).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -123,18 +123,19 @@ const Dashboard = () => {
     <div className="flex h-[80vh] w-full pl-10">
       <div className="flex items-center justify-between w-full h-[80vh] p-4 gap-4 lg:flex-row flex-col">
         <div className="flex flex-col items-center justify-start w-full h-full rounded-lg p-4 gap-y-6">
-          <h2 className="text-xl text-center font-semibold">Enter GitHub Repository URL</h2>
+          <h2 className="text-xl text-center font-semibold">
+            Enter GitHub Repository URL
+          </h2>
           <input
             type="text"
             value={repoUrl}
             onChange={(e) => setRepoUrl(e.target.value)}
             className="w-full h-96 p-3 rounded-lg focus:border-none focus:outline-none"
-            placeholder="Enter GitHub repo URL here..."
+            placeholder="Enter GitHub repo URL (only) here..."
           />
-          <button 
-            className="rounded-md dark:bg-white bg-black" 
+          <button
+            className="rounded-md dark:bg-white bg-black"
             onClick={handleSubmit}
-        
           >
             <span
               className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
@@ -148,9 +149,15 @@ const Dashboard = () => {
         <div className="border-r-1 dark:border-white border-black h-full" />
 
         <div className="flex flex-col items-center justify-start w-full h-full rounded-lg p-4 gap-y-6">
-          <h2 className="text-xl text-center font-semibold">Generated Markdown Output</h2>
+          <h2 className="text-xl text-center font-semibold">
+            Generated Markdown Output
+          </h2>
           <div className="w-full h-96 p-3 rounded-lg overflow-auto bg-transparent">
             {error && <p className="text-red-500">Error: {error}</p>}
+
+            {isLoading && (
+              <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+            )}
 
             <ReactMarkdown>
               {response && response !== "Processing your request..."
@@ -158,10 +165,9 @@ const Dashboard = () => {
                 : response || "Your processed content will appear here"}
             </ReactMarkdown>
           </div>
-          <button 
-            className="rounded-md dark:bg-white bg-black" 
+          <button
+            className="rounded-md dark:bg-white bg-black"
             onClick={handleCopy}
-            
           >
             <span
               className={`flex items-center gap-2  -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
@@ -179,4 +185,3 @@ const Dashboard = () => {
 };
 
 export default Index;
-
