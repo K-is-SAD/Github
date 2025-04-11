@@ -40,6 +40,27 @@ export async function POST(request: NextRequest) {
         }
         
         try {
+          // Check if output is a valid JSON string
+          const isValidJSON = (() => {
+            try {
+              const trimmedOutput = output.trim();
+              // Check if it starts with { or [ and ends with } or ]
+              const startsWithBrace = trimmedOutput.startsWith('{') || trimmedOutput.startsWith('[');
+              const endsWithBrace = trimmedOutput.endsWith('}') || trimmedOutput.endsWith(']');
+              return startsWithBrace && endsWithBrace;
+            } catch {
+              return false;
+            }
+          })();
+        
+          if (!isValidJSON) {
+            console.error("Output is not valid JSON format:", output);
+            return resolve(NextResponse.json(
+              { error: 'Output from Python is not in valid JSON format', success: false },
+              { status: 500 }
+            ));
+          }
+        
           const parsedOutput = JSON.parse(output);
           resolve(NextResponse.json(parsedOutput));
         } catch (parseError) {
