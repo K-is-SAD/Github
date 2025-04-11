@@ -20,8 +20,9 @@ def split_into_chunks(content, chunk_size):
     
     for i in range(0, len(tokens), chunk_size):
         chunk = " ".join(tokens[i:i + chunk_size])
-        print(f"Chunk {i + 1}: {chunk[:50]}...")
-        print("-----------------------------------------------------------------------------------") 
+        # Print to stderr instead of stdout
+        print(f"Chunk {i + 1}: {chunk[:50]}...", file=sys.stderr)
+        print("-----------------------------------------------------------------------------------", file=sys.stderr) 
         chunks.append(chunk)
     
     return chunks
@@ -71,11 +72,9 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
             f"Based on your analysis of all chunks, here are your findings:\n\n"
             f"{' '.join(responses)}"
         )
-        
         final_response = client.models.generate_content(
             model="gemini-2.0-flash", contents=integration_prompt
         )
-        
         return final_response.text
     except Exception as e:
         print(f"Error analyzing with Gemini: {e}", file=sys.stderr)
@@ -85,12 +84,30 @@ def generate_with_groq(gemini_output):
     """Use Groq to generate a comprehensive summary based on Gemini's analysis."""
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        
         truncated_output = truncate_content(gemini_output, TOKEN_LIMIT)
         
         prompt = (
             "Based on the following key code elements extracted from a repository, "
-            "provide a detailed summary of each and every extracted file.\n\n"
+            "provide a comprehensive technical analysis with the following structure:\n\n"
+            "# Technical Analysis: [Repository Name]\n\n"
+            "## 1. Executive Summary\n"
+            "< Brief overview of the repository purpose and architecture >\n\n"
+            "## 2. File-by-File Analysis\n\n"
+            "< For each important file >\n"
+            "### `filename.ext`\n"
+            "**Purpose**: < What this file does >\n"
+            "**Key Components**:\n"
+            "- < Component 1 >: Description and purpose\n"
+            "- < Component 2 >: Description and purpose\n"
+            "**Code Highlights**:\n"
+            "```language\n// Notable code with explanation\n```\n"
+            "**Integration Points**: < How this file connects with others >\n\n"
+            "## 3. System Architecture\n"
+            "< Overall system design, patterns, and data flow >\n\n"
+            "## 4. Dependencies and External Services\n"
+            "< Key libraries, APIs, and services used >\n\n"
+            "## 5. Potential Improvements\n"
+            "< Suggestions for code quality, performance, security >\n\n"
             f"{truncated_output}"
         )
         
@@ -98,7 +115,6 @@ def generate_with_groq(gemini_output):
             messages=[{"role": "user", "content": prompt}],
             model="llama-3.3-70b-versatile",
         )
-        
         return chat_completion.choices[0].message.content
     except Exception as e:
         print(f"Error generating response with Groq: {e}", file=sys.stderr)
@@ -123,7 +139,6 @@ async def run_pipeline(github_url):
             "repoSummary": groq_summary,
             "success": True
         }
-        
         return result
     except Exception as e:
         return {
