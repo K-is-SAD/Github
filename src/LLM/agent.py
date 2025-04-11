@@ -22,8 +22,9 @@ def split_into_chunks(content, chunk_size):
     
     for i in range(0, len(tokens), chunk_size):
         chunk = " ".join(tokens[i:i + chunk_size])
-        print(f"Chunk {i + 1}: {chunk[:50]}...")
-        print("-----------------------------------------------------------------------------------") 
+        # Print to stderr instead of stdout
+        print(f"Chunk {i + 1}: {chunk[:50]}...", file=sys.stderr)
+        print("-----------------------------------------------------------------------------------", file=sys.stderr) 
         chunks.append(chunk)
     
     return chunks
@@ -67,7 +68,6 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
             f"{integration_prompts}"
             f"{' '.join(responses)}"
         )
-        
         final_response = client.models.generate_content(
             model="gemini-2.0-flash", contents=integration_prompt
         )
@@ -81,7 +81,6 @@ def generate_with_groq(gemini_output):
     """Use Groq to generate a comprehensive summary based on Gemini's analysis."""
     try:
         client = Groq(api_key=GROQ_API_KEY)
-        
         truncated_output = truncate_content(gemini_output, TOKEN_LIMIT)
         
         prompt = (
@@ -93,7 +92,6 @@ def generate_with_groq(gemini_output):
             messages=[{"role": "user", "content": prompt}],
             model="llama-3.3-70b-versatile",
         )
-        
         return chat_completion.choices[0].message.content
     except Exception as e:
         print(f"Error generating response with Groq: {e}", file=sys.stderr)
@@ -121,7 +119,6 @@ async def run_pipeline(github_url):
             "repoSummary": groq_summary,
             "success": True
         }
-        
         return result
     except Exception as e:
         return {
