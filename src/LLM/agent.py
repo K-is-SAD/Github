@@ -20,6 +20,8 @@ def split_into_chunks(content, chunk_size):
     
     for i in range(0, len(tokens), chunk_size):
         chunk = " ".join(tokens[i:i + chunk_size])
+        print(f"Chunk {i + 1}: {chunk[:50]}...")
+        print("-----------------------------------------------------------------------------------") 
         chunks.append(chunk)
     
     return chunks
