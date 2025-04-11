@@ -13,25 +13,41 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
- 
+    
     const scriptPath = path.resolve(process.cwd(), 'src/LLM/agent.py');
-    const pythonProcess = spawn('python', [scriptPath, githubUrl]);
+    
+    // Set encoding options for the child process
+    const pythonProcess = spawn('python', [scriptPath, githubUrl], {
+      env: {
+        ...process.env,
+        PYTHONIOENCODING: 'utf-8'  // Ensure Python uses UTF-8 for I/O
+      }
+    });
     
     let output = '';
     pythonProcess.stdout.on('data', (data) => {
-      output += data.toString();
+      // Handle potential encoding issues
+      try {
+        output += data.toString('utf-8');
+      } catch (e) {
+        console.error("Error processing stdout data:", e);
+      }
     });
     
     let error = '';
     pythonProcess.stderr.on('data', (data) => {
-      error += data.toString();
-      console.error("Python error:", data.toString());
+      try {
+        const errorText = data.toString('utf-8');
+        error += errorText;
+        console.error("Python error:", errorText);
+      } catch (e) {
+        console.error("Error processing stderr data:", e);
+      }
     });
     
     return new Promise((resolve) => {
       pythonProcess.on('close', (code) => {
-  
-        
+        // If process completed with error or no output
         if (code !== 0 || !output) {
           return resolve(NextResponse.json(
             { error: `Python script failed: ${error || 'No output received'}`, success: false },
@@ -40,31 +56,15 @@ export async function POST(request: NextRequest) {
         }
         
         try {
-          // Check if output is a valid JSON string
-          const isValidJSON = (() => {
-            try {
-              const trimmedOutput = output.trim();
-              // Check if it starts with { or [ and ends with } or ]
-              const startsWithBrace = trimmedOutput.startsWith('{') || trimmedOutput.startsWith('[');
-              const endsWithBrace = trimmedOutput.endsWith('}') || trimmedOutput.endsWith(']');
-              return startsWithBrace && endsWithBrace;
-            } catch {
-              return false;
-            }
-          })();
-        
-          if (!isValidJSON) {
-            console.error("Output is not valid JSON format:", output);
-            return resolve(NextResponse.json(
-              { error: 'Output from Python is not in valid JSON format', success: false },
-              { status: 500 }
-            ));
-          }
-        
+          // Parse the JSON output from the Python script
           const parsedOutput = JSON.parse(output);
+          
+          // Simply pass through the parsed output as it should already have the
+          // correct structure from agent.py: {repoMarkdown, repoSummary, success}
           resolve(NextResponse.json(parsedOutput));
         } catch (parseError) {
           console.error("Error parsing JSON from Python:", parseError);
+          console.error("Raw output:", output);
           resolve(NextResponse.json(
             { error: 'Invalid JSON output from Python script', success: false },
             { status: 500 }

@@ -6,6 +6,8 @@ from gitingest import ingest_async
 from google import genai
 from groq import Groq
 from dotenv import load_dotenv
+from prompts import chunk_prompts
+from prompts import integration_prompts
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -52,8 +54,7 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
             chunk_prompt = (
                 f"{base_prompt}"
                 f"Files Content (Part {i+1}/{len(content_chunks)}):\n{chunk}\n\n"
-                "Based on this chunk of the repository, identify any important files, functions, "
-                "classes, or components you find. Focus on understanding what this code does."
+                f"{chunk_prompts}"
             )
             
             chunk_response = client.models.generate_content(
@@ -63,12 +64,7 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
             responses.append(chunk_response.text)
 
         integration_prompt = (
-            "Now that you've analyzed all parts of the repository, provide a consolidated analysis. "
-            "Identify the key files, functions, classes, components, frontend, backend, and database files. "
-            "Your response must be under 4000 tokens. Format as follows:\n\n"
-            "RELEVANT FILES:\n- file1.py\n- file2.js\n\n"
-            "KEY CODE ELEMENTS:\n```filename: file1.py\ndef important_function():\n    # code\n```\n\n"
-            f"Based on your analysis of all chunks, here are your findings:\n\n"
+            f"{integration_prompts}"
             f"{' '.join(responses)}"
         )
         
@@ -76,7 +72,7 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
             model="gemini-2.0-flash", contents=integration_prompt
         )
         
-        return final_response.text
+        return final_response.text, responses
     except Exception as e:
         print(f"Error analyzing with Gemini: {e}", file=sys.stderr)
         return None
@@ -89,8 +85,7 @@ def generate_with_groq(gemini_output):
         truncated_output = truncate_content(gemini_output, TOKEN_LIMIT)
         
         prompt = (
-            "Based on the following key code elements extracted from a repository, "
-            "provide a detailed summary of each and every extracted file.\n\n"
+            f"{integration_prompts}"
             f"{truncated_output}"
         )
         
@@ -107,19 +102,22 @@ def generate_with_groq(gemini_output):
 async def run_pipeline(github_url):
     try:
         summary, tree, content = await ingest_async(github_url)
+        # print("----------TREE----------")
+        print(tree)
+        # print("--------------------------")
         if not summary or not tree or not content:
             raise ValueError("Failed to fetch repository details.")
         
-        gemini_response = analyze_with_gemini(summary, tree, content)
+        gemini_response, responses = analyze_with_gemini(summary, tree, content)
         if not gemini_response:
             raise ValueError("Failed to analyze repository with Gemini.")
         
-        groq_summary = generate_with_groq(gemini_response)
+        groq_summary = generate_with_groq(responses)
         if not groq_summary:
             raise ValueError("Failed to generate summary with Groq.")
         
         result = {
-            "repoMarkdown": gemini_response,
+            "repoMarkdown": groq_summary, ##gemini_response,
             "repoSummary": groq_summary,
             "success": True
         }
@@ -131,17 +129,18 @@ async def run_pipeline(github_url):
             "success": False
         }
 
-async def main():
-    if len(sys.argv) < 2:
+async def main(github_repo_url=str):
+    result = {}
+    if github_repo_url == None or github_repo_url == "":
         result = {
             "error": "No GitHub URL provided.",
             "success": False
         }
     else:
-        github_repo_url = sys.argv[1]
         result = await run_pipeline(github_repo_url)
     
     print(json.dumps(result))
+    return result
 
 if __name__ == "__main__":
     asyncio.run(main())
