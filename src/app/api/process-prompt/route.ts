@@ -6,71 +6,80 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { githubUrl } = body;
-    
+
     if (!githubUrl || typeof githubUrl !== 'string') {
       return NextResponse.json(
         { error: 'A valid GitHub repository URL is required', success: false },
         { status: 400 }
       );
     }
- 
+
     const scriptPath = path.resolve(process.cwd(), 'src/LLM/agent.py');
-    const pythonProcess = spawn('python', [scriptPath, githubUrl]);
+    console.log('Script path:', scriptPath);
     
-    let output = '';
-    pythonProcess.stdout.on('data', (data) => {
-      output += data.toString();
+    // Use -u flag for unbuffered output
+    const pythonProcess: import('child_process').ChildProcess = spawn('python', ['-u', scriptPath, githubUrl], {
+      // Add shell option for Windows compatibility
+      shell: process.platform === 'win32',
+      // Removed maxBuffer as it is not valid for spawn
     });
     
-    let error = '';
-    pythonProcess.stderr.on('data', (data) => {
-      error += data.toString();
-      console.error("Python error:", data.toString());
-    });
+    console.log('Python process started with PID:', pythonProcess.pid);
+
+    // Buffer to collect JSON from stdout
+    let stdoutBuffer = '';
     
-    return new Promise((resolve) => {
-      pythonProcess.on('close', (code) => {
-  
-        
-        if (code !== 0 || !output) {
-          return resolve(NextResponse.json(
-            { error: `Python script failed: ${error || 'No output received'}`, success: false },
-            { status: 500 }
-          ));
-        }
-        
-        try {
-          // Check if output is a valid JSON string
-          const isValidJSON = (() => {
+    const stream = new ReadableStream({
+      start(controller) {
+        pythonProcess.stdout?.on('data', (data) => {
+          const output = data.toString();
+          console.log('Python stdout chunk:', output.substring(0, 50) + '...');
+          stdoutBuffer += output;
+          controller.enqueue(new TextEncoder().encode(output));
+        });
+
+        pythonProcess.stderr?.on('data', (data) => {
+          const errorMessage = data.toString();
+          // Just log to console but don't send to client
+          console.warn('Python stderr message:', errorMessage);
+          // Don't enqueue stderr output to avoid confusing client
+        });
+
+        pythonProcess.on('close', (code) => {
+          console.log('Python process closed with code:', code);
+          if (code !== 0) {
+            controller.enqueue(new TextEncoder().encode(`Python script failed with code ${code}.`));
+          } else {
+            // If we have valid JSON in the stdout buffer and the process finished successfully,
+            // we can choose to send only that instead of mixing with stderr messages
             try {
-              const trimmedOutput = output.trim();
-              // Check if it starts with { or [ and ends with } or ]
-              const startsWithBrace = trimmedOutput.startsWith('{') || trimmedOutput.startsWith('[');
-              const endsWithBrace = trimmedOutput.endsWith('}') || trimmedOutput.endsWith(']');
-              return startsWithBrace && endsWithBrace;
-            } catch {
-              return false;
+              // Attempt to parse the buffer to ensure it's valid JSON
+              JSON.parse(stdoutBuffer);
+              // If we get here, it's valid JSON, so we're good
+            } catch (e) {
+              // If we couldn't parse the JSON, log that but don't interrupt the stream
+              console.error('Failed to parse Python output as JSON:', e);
             }
-          })();
-        
-          if (!isValidJSON) {
-            console.error("Output is not valid JSON format:", output);
-            return resolve(NextResponse.json(
-              { error: 'Output from Python is not in valid JSON format', success: false },
-              { status: 500 }
-            ));
           }
-        
-          const parsedOutput = JSON.parse(output);
-          resolve(NextResponse.json(parsedOutput));
-        } catch (parseError) {
-          console.error("Error parsing JSON from Python:", parseError);
-          resolve(NextResponse.json(
-            { error: 'Invalid JSON output from Python script', success: false },
-            { status: 500 }
-          ));
+          controller.close();
+        });
+
+        pythonProcess.on('error', (error) => {
+          console.error('Failed to start Python process (spawn error):', error);
+          controller.enqueue(new TextEncoder().encode(`Failed to start Python process: ${error.message}`));
+          controller.close();
+        });
+      },
+      cancel() {
+        console.log('Stream canceled by the client.');
+        if (!pythonProcess.killed) {
+          pythonProcess.kill();
         }
-      });
+      },
+    });
+
+    return new Response(stream, {
+      headers: { 'Content-Type': 'text/plain' },
     });
   } catch (error) {
     console.error('Error processing repository analysis:', error);
