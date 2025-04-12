@@ -1,5 +1,5 @@
 import React from "react";
-
+import { features } from "@/assets/data";
 import Grid from "@/components/grids/Index";
 
 const page = () => {
@@ -69,136 +69,38 @@ const page = () => {
               </div>
               <div className="flex px-2 py-2 ">
                 <div className="space-y-2">
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Attend events
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Automatic updates
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Backup your account
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Audit log and notes
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Feature requests
-                  </ul>
+                  {features.map((feature) => (
+                    <ul key={feature.id} className="flex items-center gap-2">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-blue-500"
+                      >
+                        <circle
+                          cx="8"
+                          cy="8"
+                          r="7"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        />
+                        <path
+                          d="M5.5 8L7 9.5L10.5 6"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span
+                        className={feature.highlighted ? "font-medium" : ""}
+                      >
+                        {feature.text}
+                      </span>
+                    </ul>
+                  ))}
                 </div>
               </div>
             </div>
@@ -216,12 +118,19 @@ const page = () => {
             <div className="flex flex-col justify-center items-center gap-y-4">
               <div className="text-center">
                 <h1 className="font-semibold text-xl">Advanced</h1>
-                <p className="text-gray-400">Advanced features and reporting</p>
+                <p className="dark:text-gray-400 text-black">
+                  Advanced features and reporting
+                </p>
               </div>
               <div className="text-right">
-                <span className="text-2xl text-gray-400"> $</span>
+                <span className="text-2xl dark:text-gray-400 text-black">
+                  {" "}
+                  $
+                </span>
                 <span className="font-bold text-4xl">69</span>
-                <span className="text-gray-400 text-sm">/per month</span>
+                <span className="dark:text-gray-400 text-black text-sm">
+                  /per month
+                </span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center">
@@ -233,136 +142,38 @@ const page = () => {
               </div>
               <div className="flex items-center justify-between px-2 py-2 ">
                 <div className="space-y-2">
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Advanced custom fields
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Audit log and data history
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Backup your account
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    Personalized Service
-                  </ul>
-                  <ul className="flex items-center gap-2">
-                    <svg
-                      width="16"
-                      height="16"
-                      viewBox="0 0 16 16"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="text-blue-500"
-                    >
-                      <circle
-                        cx="8"
-                        cy="8"
-                        r="7"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                      />
-                      <path
-                        d="M5.5 8L7 9.5L10.5 6"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                    +many more...
-                  </ul>
+                  {features.map((feature) => (
+                    <ul key={feature.id} className="flex items-center gap-2">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="text-blue-500"
+                      >
+                        <circle
+                          cx="8"
+                          cy="8"
+                          r="7"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                        />
+                        <path
+                          d="M5.5 8L7 9.5L10.5 6"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span
+                        className={feature.highlighted ? "font-medium" : ""}
+                      >
+                        {feature.text}
+                      </span>
+                    </ul>
+                  ))}
                 </div>
               </div>
             </div>
