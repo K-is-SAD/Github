@@ -1,10 +1,11 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Toggle from "@/components/toggle/Index";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { UserButton, useUser } from "@clerk/nextjs";
 
 const navlinks: any[] = [
   {
@@ -25,6 +26,10 @@ const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const pathname = usePathname();
+  const { isSignedIn, user } = useUser();
+  
+  const isRootPath = pathname === "/";
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -40,7 +45,6 @@ const Index = () => {
       document.body.style.overflow = "unset";
     };
   }, [isMenuOpen]);
-
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -79,18 +83,50 @@ const Index = () => {
             <Toggle />
             
             <div className="flex items-center gap-x-2">
-              <Link
-                href={"/sign-in"}
-                className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-              >
-                Login
-              </Link>
-              <Link
-                href={"/sign-up"}
-                className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-              >
-                SignUp
-              </Link>
+              {isRootPath ? (
+                <>
+                  <Link
+                    href={"/sign-in"}
+                    className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href={"/sign-up"}
+                    className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
+                  >
+                    SignUp
+                  </Link>
+                </>
+              ) : (
+                <div className="flex items-center gap-x-3">
+                  {isSignedIn && user && (
+                    <div className="flex items-center gap-x-2">
+                      <div className="text-sm hidden md:block">
+                        <span className="font-medium">{user.firstName || user.username}</span>
+                      </div>
+                      <UserButton afterSignOutUrl="/" />
+                    </div>
+                  )}
+                  
+                  {!isSignedIn && (
+                    <>
+                      <Link
+                        href={"/sign-in"}
+                        className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        href={"/sign-up"}
+                        className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
+                      >
+                        SignUp
+                      </Link>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
             
             <button 
