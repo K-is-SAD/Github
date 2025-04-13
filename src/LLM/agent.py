@@ -6,6 +6,7 @@ from gitingest import ingest_async
 from google import genai
 from groq import Groq
 from dotenv import load_dotenv
+from prompts import GEMINI_BASE_PROMPT, GEMINI_CHUNK_PROMPT, GEMINI_INTEGRATION_PROMPT, GROQ_SUMMARY_PROMPT
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -40,21 +41,19 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
         client = genai.Client(api_key=GEMINI_API_KEY)
         content_chunks = split_into_chunks(repo_content, CHUNK_SIZE)
         
-        base_prompt = (
-            "You are analyzing a GitHub repository in parts. "
-            "First, understand the repository structure and key files.\n\n"
-            f"Repository Summary: {repo_summary}\n\n"
-            f"Repository Files: {repo_tree}\n\n"
+        base_prompt = GEMINI_BASE_PROMPT.format(
+            repo_summary=repo_summary,
+            repo_tree=repo_tree
         )
         
         responses = []
 
         for i, chunk in enumerate(content_chunks):
-            chunk_prompt = (
-                f"{base_prompt}"
-                f"Files Content (Part {i+1}/{len(content_chunks)}):\n{chunk}\n\n"
-                "Based on this chunk of the repository, identify any important files, functions, "
-                "classes, or components you find. Focus on understanding what this code does."
+            chunk_prompt = GEMINI_CHUNK_PROMPT.format(
+                base_prompt=base_prompt,
+                chunk_num=i+1,
+                total_chunks=len(content_chunks),
+                chunk=chunk
             )
             
             chunk_response = client.models.generate_content(
@@ -63,15 +62,10 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
             
             responses.append(chunk_response.text)
 
-        integration_prompt = (
-            "Now that you've analyzed all parts of the repository, provide a consolidated analysis. "
-            "Identify the key files, functions, classes, components, frontend, backend, and database files. "
-            "Your response must be under 4000 tokens. Format as follows:\n\n"
-            "RELEVANT FILES:\n- file1.py\n- file2.js\n\n"
-            "KEY CODE ELEMENTS:\n```filename: file1.py\ndef important_function():\n    # code\n```\n\n"
-            f"Based on your analysis of all chunks, here are your findings:\n\n"
-            f"{' '.join(responses)}"
+        integration_prompt = GEMINI_INTEGRATION_PROMPT.format(
+            responses=' '.join(responses)
         )
+        
         final_response = client.models.generate_content(
             model="gemini-2.0-flash", contents=integration_prompt
         )
@@ -86,30 +80,7 @@ def generate_with_groq(gemini_output):
         client = Groq(api_key=GROQ_API_KEY)
         truncated_output = truncate_content(gemini_output, TOKEN_LIMIT)
         
-        prompt = (
-            "Based on the following key code elements extracted from a repository, "
-            "provide a comprehensive technical analysis with the following structure:\n\n"
-            "# Technical Analysis: [Repository Name]\n\n"
-            "## 1. Executive Summary\n"
-            "< Brief overview of the repository purpose and architecture >\n\n"
-            "## 2. File-by-File Analysis\n\n"
-            "< For each important file >\n"
-            "### `filename.ext`\n"
-            "**Purpose**: < What this file does >\n"
-            "**Key Components**:\n"
-            "- < Component 1 >: Description and purpose\n"
-            "- < Component 2 >: Description and purpose\n"
-            "**Code Highlights**:\n"
-            "```language\n// Notable code with explanation\n```\n"
-            "**Integration Points**: < How this file connects with others >\n\n"
-            "## 3. System Architecture\n"
-            "< Overall system design, patterns, and data flow >\n\n"
-            "## 4. Dependencies and External Services\n"
-            "< Key libraries, APIs, and services used >\n\n"
-            "## 5. Potential Improvements\n"
-            "< Suggestions for code quality, performance, security >\n\n"
-            f"{truncated_output}"
-        )
+        prompt = GROQ_SUMMARY_PROMPT.format(gemini_output=truncated_output)
         
         chat_completion = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],

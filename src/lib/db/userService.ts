@@ -100,7 +100,10 @@ export async function getAllUsers(limit = 100, skip = 0) {
     .skip(skip);
 }
 
-export function updateUserPreferences(request: NextRequest, preferences: any) {
+//i dont know if clerk has something like this, but this is a function to update user preferences in the database
+// This function is not implemented yet, but it should update user preferences in the database
+export function updateUserPreferences(request: NextRequest, preferences: Record<string, unknown>) {
+    console.log('updateUserPreferences', preferences);
     throw new Error('Function not implemented.');
 }
 
