@@ -577,7 +577,7 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-lg font-medium mb-4">Connected Services</h2>
                   
-                  <div className="bg-transparent rounded-lg mb-6">
+                  <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg mb-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4">
                         <IconBrandGithub size={32} className="mt-1" />
