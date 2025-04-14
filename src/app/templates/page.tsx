@@ -22,6 +22,7 @@ export default function TemplatesPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -30,10 +31,23 @@ export default function TemplatesPage() {
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
+        
         const data = await response.json();
-        setTemplates(data);
+        
+        // Check if data is an array
+        if (!Array.isArray(data)) {
+          // Fix the TypeScript error by ensuring proper type handling
+          console.error("Expected array but received:", typeof data, data);
+          setError("Invalid data format received from API");
+          setTemplates([]);
+        } else {
+          setTemplates(data);
+        }
       } catch (error) {
-        console.error("Failed to fetch templates:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("Failed to fetch templates:", errorMessage);
+        setError("Failed to load templates");
+        setTemplates([]);
       } finally {
         setLoading(false);
       }
@@ -47,6 +61,7 @@ export default function TemplatesPage() {
     setTimeout(() => setCopied(null), 2000);
   };
 
+  // Make sure templates is an array before filtering
   const filteredTemplates = templates.filter(template => {
     if (filter === "all") return true;
     if (filter === "default") return template.isDefault;
@@ -54,6 +69,7 @@ export default function TemplatesPage() {
     return template.tags.includes(filter);
   });
 
+  // Calculate available tags
   const availableTags = [...new Set(templates.flatMap(t => t.tags))];
 
   return (
@@ -111,6 +127,11 @@ export default function TemplatesPage() {
         {loading ? (
           <div className="flex justify-center py-20">
             <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <p className="text-xl text-red-500">{error}</p>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">Please try again later or contact support</p>
           </div>
         ) : filteredTemplates.length === 0 ? (
           <div className="text-center py-16">
