@@ -19,6 +19,19 @@ const navlinks: any[] = [
     name: "Pricing",
     href: "/pricing",
   },
+  {
+    name:"Editor",
+    href: "/editor"
+  },
+
+  {
+    name:"Templates",
+    href: "/templates"
+  },
+  {
+    name:"Profile",
+    href:"/profile"
+  }
 ];
 
 const Index = () => {

@@ -223,7 +223,7 @@ export default function ProfilePage() {
       </div>
       <div className="relative z-10 container mx-auto px-4 py-8 pt-24">
         <div className="max-w-5xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+          <div className="bg-transparent border-2 dark:border-white border-black rounded-lg shadow-lg overflow-hidden">
             {/* Profile Header */}
             <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-500">
               <div className="absolute -bottom-12 left-8">
@@ -253,11 +253,13 @@ export default function ProfilePage() {
                     </p>
                   )}
                 </div>
-                <Button className="rounded-md dark:bg-white bg-black">
-                  <span className="flex items-center -translate-x-1 -translate-y-1 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 hover:-translate-y-2 active:translate-x-0 active:translate-y-0 transition-all">
+                <button className="rounded-md dark:bg-white bg-black">
+                  <span  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+               `}>
                     Edit Profile
                   </span>
-                </Button>
+                </button>
               </div>
 
               {/* Tabs */}
@@ -543,7 +545,7 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-lg font-medium mb-4">Activity History</h2>
                   
-                  <div className="bg-white dark:bg-gray-800 rounded-lg">
+                  <div className="bg-transparent border-2 dark:border-white border-black rounded-lg">
                     {activity.map(item => (
                       <div 
                         key={item._id} 
@@ -575,7 +577,7 @@ export default function ProfilePage() {
                 <div>
                   <h2 className="text-lg font-medium mb-4">Connected Services</h2>
                   
-                  <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg mb-6">
+                  <div className="bg-transparent rounded-lg mb-6">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4">
                         <IconBrandGithub size={32} className="mt-1" />
@@ -592,15 +594,17 @@ export default function ProfilePage() {
                         </div>
                       </div>
                       
-                      <Button 
-                        className={`rounded-md ${githubToken ? 'bg-transparent border border-gray-300 dark:border-gray-600' : 'dark:bg-white bg-black'}`}
+                      <button
+                        className={`rounded-md ${githubToken ? 'dark:bg-black bg-white border-2 dark:border-white border-black px-2 py-2' : 'dark:bg-white bg-black'}`}
                         onClick={handleConnectGitHub}
                         disabled={isConnecting}
                       >
                         {githubToken ? (
                           "Disconnect"
                         ) : (
-                          <span className="flex items-center -translate-x-1 -translate-y-1 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 hover:-translate-y-2 active:translate-x-0 active:translate-y-0 transition-all">
+                          <span  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                            hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                           `}>
                             {isConnecting ? (
                               <>
                                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
@@ -611,40 +615,42 @@ export default function ProfilePage() {
                             )}
                           </span>
                         )}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                   
                   <h2 className="text-lg font-medium mb-4">API Keys</h2>
-                  <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg">
+                  <div className="bg-transparent p-6 rounded-lg">
                     <div className="flex items-start space-x-4">
                       <IconKey size={32} className="mt-1" />
-                      <div className="flex-1">
+                      <div className="flex-1 space-y-8">
                         <h3 className="font-medium">API Access</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                           Generate an API key to access our services programmatically
                         </p>
                         
-                        <div className="mt-4 flex items-center">
+                        <div className="mt-4 flex items-center ">
                           <input 
                             type="text"
                             value="••••••••••••••••••••••••••••••"
                             readOnly
-                            className="w-full p-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500"
+                            className="w-full p-2 rounded-l-md  bg-transparent border-1 dark:border-white border-black text-gray-500"
                           />
                           <button 
-                            className="p-2 rounded-r-md bg-gray-200 dark:bg-gray-700 border border-l-0 border-gray-300 dark:border-gray-600 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                            className="p-2 rounded-r-md bg-gray-200 dark:bg-gray-700 border-1 dark:border-white border-white border-l-0  hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                           >
                             Copy
                           </button>
                         </div>
                         
                         <div className="mt-4">
-                          <Button className="rounded-md dark:bg-white bg-black">
-                            <span className="block -translate-x-1 -translate-y-1 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 hover:-translate-y-2 active:translate-x-0 active:translate-y-0 transition-all">
+                          <button className="rounded-md dark:bg-white bg-black">
+                            <span  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+               `}>
                               Generate New Key
                             </span>
-                          </Button>
+                          </button>
                         </div>
                       </div>
                     </div>

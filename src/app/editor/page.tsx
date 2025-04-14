@@ -4,14 +4,14 @@ import Grid from "@/components/grids/Index";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "next/navigation";
-import { 
-  IconRefresh, 
-  IconBrandGithub, 
-  IconEye, 
-  IconCode, 
+import {
+  IconRefresh,
+  IconBrandGithub,
+  IconEye,
+  IconCode,
   IconDeviceFloppy,
   IconCheck,
-  IconDownload
+  IconDownload,
 } from "@tabler/icons-react";
 
 interface Section {
@@ -33,7 +33,7 @@ export default function EditorPage() {
   const searchParams = useSearchParams();
   const templateId = searchParams.get("template");
   const repoId = searchParams.get("repo");
-  
+
   const [content, setContent] = useState<string>("");
   const [previewMode, setPreviewMode] = useState<boolean>(false);
   const [repository, setRepository] = useState<string>("");
@@ -54,24 +54,30 @@ export default function EditorPage() {
             const data = await response.json();
             setTemplateData(data);
             setTitle(data.name);
-            
+
             // Initialize sections from template
             if (data.sections && data.sections.length > 0) {
               const initialSections = data.sections.map((section: Section) => ({
                 title: section.title,
-                description: section.description || '',
-                content: section.defaultContent || '',
-                order: section.order
+                description: section.description || "",
+                content: section.defaultContent || "",
+                order: section.order,
               }));
-              
-              initialSections.sort((a: { order: number; }, b: { order: number; }) => a.order - b.order);
+
+              initialSections.sort(
+                (a: { order: number }, b: { order: number }) =>
+                  a.order - b.order
+              );
               setSections(initialSections);
-              
+
               // Generate initial content from sections
               const initialContent = initialSections
-                .map((section: { title: unknown; content: unknown; }) => `## ${section.title}\n\n${section.content}`)
-                .join('\n\n');
-              
+                .map(
+                  (section: { title: unknown; content: unknown }) =>
+                    `## ${section.title}\n\n${section.content}`
+                )
+                .join("\n\n");
+
               setContent(`# ${data.name}\n\n${initialContent}`);
             }
           }
@@ -79,7 +85,7 @@ export default function EditorPage() {
           console.error("Error fetching template:", error);
         }
       }
-      
+
       if (repoId) {
         try {
           const response = await fetch(`/api/repositories/${repoId}`);
@@ -96,13 +102,13 @@ export default function EditorPage() {
         }
       }
     };
-    
+
     fetchData();
   }, [templateId, repoId]);
 
   const handleGenerate = async () => {
     if (!repository) return;
-    
+
     setGenerating(true);
     try {
       const response = await fetch("/api/process-prompt", {
@@ -114,25 +120,29 @@ export default function EditorPage() {
       const data = await response.json();
       if (response.ok) {
         setContent(data.repoMarkdown);
-        
+
         // Extract sections if possible
         const titleMatch = data.repoMarkdown.match(/^# (.*?)$/m);
         if (titleMatch) {
           setTitle(titleMatch[1]);
         }
-        
-        const sectionMatches = data.repoMarkdown.match(/^## (.*?)$([\s\S]*?)(?=^## |\Z)/gm);
+
+        const sectionMatches = data.repoMarkdown.match(
+          /^## (.*?)$([\s\S]*?)(?=^## |\Z)/gm
+        );
         if (sectionMatches && sectionMatches.length > 0) {
-          const extractedSections = sectionMatches.map((section: string | undefined, index: number) => {
-            const titleMatch = (section ?? "").match(/^## (.*?)$/m);
-            const title = titleMatch ? titleMatch[1] : `Section ${index + 1}`;
-            const content = (section ?? "").replace(/^## .*?$/m, "").trim();
-            return {
-              title,
-              content,
-              order: index
-            };
-          });
+          const extractedSections = sectionMatches.map(
+            (section: string | undefined, index: number) => {
+              const titleMatch = (section ?? "").match(/^## (.*?)$/m);
+              const title = titleMatch ? titleMatch[1] : `Section ${index + 1}`;
+              const content = (section ?? "").replace(/^## .*?$/m, "").trim();
+              return {
+                title,
+                content,
+                order: index,
+              };
+            }
+          );
           setSections(extractedSections);
         }
       }
@@ -147,8 +157,8 @@ export default function EditorPage() {
     setSaving(true);
     try {
       // Save to database logic would go here
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       // Show saved status
       setSavedStatus(true);
       setTimeout(() => setSavedStatus(false), 3000);
@@ -163,10 +173,10 @@ export default function EditorPage() {
     const updatedSections = [...sections];
     updatedSections[index].content = sectionContent;
     setSections(updatedSections);
-    
+
     // Regenerate full content
     let fullContent = `# ${title}\n\n`;
-    updatedSections.forEach(section => {
+    updatedSections.forEach((section) => {
       fullContent += `## ${section.title}\n\n${section.content}\n\n`;
     });
     setContent(fullContent);
@@ -175,16 +185,16 @@ export default function EditorPage() {
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
     // Update the content with new title
-    const contentWithoutTitle = content.replace(/^# .*?(\n|$)/, '');
+    const contentWithoutTitle = content.replace(/^# .*?(\n|$)/, "");
     setContent(`# ${newTitle}\n${contentWithoutTitle}`);
   };
 
   const handleExport = () => {
-    const blob = new Blob([content], { type: 'text/markdown' });
+    const blob = new Blob([content], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `${title.replace(/\s+/g, '-').toLowerCase()}.md`;
+    a.download = `${title.replace(/\s+/g, "-").toLowerCase()}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -207,7 +217,8 @@ export default function EditorPage() {
               placeholder="Document Title"
             />
             <p className="text-gray-600 dark:text-gray-400 mb-6">
-              {templateData?.description || "Create and edit markdown content for your documentation"}
+              {templateData?.description ||
+                "Create and edit markdown content for your documentation"}
             </p>
           </div>
         </div>
@@ -215,7 +226,7 @@ export default function EditorPage() {
         <div className="flex flex-col lg:flex-row gap-6 mb-4 max-w-7xl mx-auto">
           {/* Sidebar - Repository Info and Sections */}
           <div className="w-full lg:w-1/4">
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-4">
+            <div className=" bg-transparent p-4 rounded-lg shadow mb-4 border-2 dark:border-white border-black">
               <h2 className="text-lg font-semibold mb-3">Repository</h2>
               <div className="flex mb-3">
                 <input
@@ -223,9 +234,9 @@ export default function EditorPage() {
                   value={repository}
                   onChange={(e) => setRepository(e.target.value)}
                   placeholder="Enter GitHub repository URL"
-                  className="w-full rounded-l-md p-2 border focus:outline-none dark:bg-gray-700 dark:border-gray-600"
+                  className="w-full rounded-l-md p-2  focus:outline-none bg-transparent border-2 dark:border-white border-black"
                 />
-                <button 
+                <button
                   onClick={handleGenerate}
                   disabled={generating || !repository}
                   className="bg-black dark:bg-white text-white dark:text-black rounded-r-md px-3 disabled:opacity-50 flex items-center justify-center"
@@ -243,19 +254,19 @@ export default function EditorPage() {
                 </p>
               )}
             </div>
-            
+
             {/* Sections Navigation */}
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+            <div className="bg-transparent border-2 dark:border-white border-black p-4 rounded-lg shadow">
               <h2 className="text-lg font-semibold mb-3">Sections</h2>
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {sections.length > 0 ? (
                   sections.map((section, index) => (
-                    <div 
+                    <div
                       key={index}
                       onClick={() => setActiveSection(index)}
                       className={`p-3 rounded-md cursor-pointer transition-colors ${
-                        activeSection === index 
-                          ? "bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500" 
+                        activeSection === index
+                          ? "bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500"
                           : "hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                     >
@@ -269,7 +280,8 @@ export default function EditorPage() {
                   ))
                 ) : (
                   <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
-                    No sections defined yet. Generate content from a repository or start editing.
+                    No sections defined yet. Generate content from a repository
+                    or start editing.
                   </p>
                 )}
               </div>
@@ -286,21 +298,25 @@ export default function EditorPage() {
                   </span>
                 )}
               </div>
-              
+
               <div className="inline-flex rounded-md shadow-sm" role="group">
                 <button
                   onClick={() => setPreviewMode(false)}
-                  className={`px-4 py-2 text-sm font-medium rounded-l-lg flex items-center ${!previewMode 
-                    ? 'bg-black dark:bg-white text-white dark:text-black' 
-                    : 'bg-gray-200 dark:bg-gray-700'}`}
+                  className={`px-4 py-2 text-sm font-medium rounded-l-lg flex items-center ${
+                    !previewMode
+                      ? "bg-black dark:bg-white text-white dark:text-black"
+                      : "bg-gray-200 dark:bg-black border dark:border-white border-black"
+                  }`}
                 >
                   <IconCode size={16} className="mr-1" /> Edit
                 </button>
                 <button
                   onClick={() => setPreviewMode(true)}
-                  className={`px-4 py-2 text-sm font-medium rounded-r-lg flex items-center ${previewMode 
-                    ? 'bg-black dark:bg-white text-white dark:text-black' 
-                    : 'bg-gray-200 dark:bg-gray-700'}`}
+                  className={`px-4 py-2 text-sm font-medium rounded-r-lg flex items-center ${
+                    previewMode
+                      ? "bg-black dark:bg-white text-white dark:text-black"
+                      : "bg-gray-200 dark:bg-black border dark:border-white border-black"
+                  }`}
                 >
                   <IconEye size={16} className="mr-1" /> Preview
                 </button>
@@ -310,7 +326,7 @@ export default function EditorPage() {
             {!previewMode ? (
               sections.length > 0 ? (
                 // Section-based editing
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                <div className=" rounded-lg shadow p-4">
                   <h3 className="text-lg font-medium mb-2">
                     {sections[activeSection]?.title}
                   </h3>
@@ -320,10 +336,14 @@ export default function EditorPage() {
                     </p>
                   )}
                   <textarea
-                    value={sections[activeSection]?.content || ''}
-                    onChange={(e) => handleSectionChange(activeSection, e.target.value)}
-                    className="w-full h-[60vh] p-4 rounded-lg border focus:outline-none dark:bg-gray-700 dark:border-gray-600 font-mono text-sm"
-                    placeholder={`Write content for ${sections[activeSection]?.title || 'this section'}...`}
+                    value={sections[activeSection]?.content || ""}
+                    onChange={(e) =>
+                      handleSectionChange(activeSection, e.target.value)
+                    }
+                     className="w-full h-[60vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow"
+                    placeholder={`Write content for ${
+                      sections[activeSection]?.title || "this section"
+                    }...`}
                   />
                 </div>
               ) : (
@@ -331,12 +351,12 @@ export default function EditorPage() {
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full h-[60vh] p-4 rounded-lg border focus:outline-none bg-white dark:bg-gray-800 dark:border-gray-600 font-mono text-sm shadow"
+                  className="w-full h-[60vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow"
                   placeholder="Start writing in markdown..."
                 />
               )
             ) : (
-              <div className="w-full h-[60vh] p-6 rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-600 overflow-auto shadow">
+              <div   className="w-full h-[60vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow">
                 <article className="prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg max-w-none">
                   <ReactMarkdown>
                     {content || "Nothing to preview yet."}
@@ -346,26 +366,40 @@ export default function EditorPage() {
             )}
 
             <div className="flex justify-between mt-4">
-              <div className="flex space-x-2">
-                <Button 
-                  className="rounded-md bg-transparent border border-gray-300 dark:border-gray-600"
+              <div className="flex space-x-4">
+                <button
+                   className="rounded-md dark:bg-white bg-black"
                   onClick={() => setContent("")}
                 >
-                  <IconRefresh className="mr-1" size={16} /> Reset
-                </Button>
-                <Button 
-                  className="rounded-md bg-transparent border border-gray-300 dark:border-gray-600"
+                  <span
+              className={` -translate-x-2 -translate-y-2 flex items-center justify-between  rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+               `}
+            >
+              <IconRefresh className="mr-1" size={16} /> Reset
+            </span>
+                </button>
+                <button
+                  className="rounded-md dark:bg-white bg-black"
                   onClick={handleExport}
                 >
-                  <IconDownload className="mr-1" size={16} /> Export
-                </Button>
+                  <span
+              className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+               `}
+            >
+             <IconDownload className="mr-1" size={16} /> Export
+            </span>
+                </button>
               </div>
-              <Button 
-                className="rounded-md dark:bg-white bg-black"
+              <button
+               className="rounded-md dark:bg-white bg-black"
                 onClick={handleSave}
                 disabled={saving}
               >
-                <span className="flex items-center -translate-x-1 -translate-y-1 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 text-sm hover:-translate-y-2 active:translate-x-0 active:translate-y-0 transition-all">
+                <span className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+               `}>
                   {saving ? (
                     <>
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
@@ -377,7 +411,7 @@ export default function EditorPage() {
                     </>
                   )}
                 </span>
-              </Button>
+              </button>
             </div>
           </div>
         </div>
