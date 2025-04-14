@@ -4,8 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Toggle from "@/components/toggle/Index";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 const navlinks: any[] = [
   {
@@ -26,10 +25,7 @@ const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
-  const pathname = usePathname();
-  const { isSignedIn, user } = useUser();
   
-  const isRootPath = pathname === "/";
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -83,50 +79,17 @@ const Index = () => {
             <Toggle />
             
             <div className="flex items-center gap-x-2">
-              {isRootPath ? (
-                <>
-                  <Link
-                    href={"/sign-in"}
-                    className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href={"/sign-up"}
-                    className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-                  >
-                    SignUp
-                  </Link>
-                </>
-              ) : (
-                <div className="flex items-center gap-x-3">
-                  {isSignedIn && user && (
-                    <div className="flex items-center gap-x-2">
-                      <div className="text-sm hidden md:block">
-                        <span className="font-medium">{user.firstName || user.username}</span>
-                      </div>
-                      <UserButton afterSignOutUrl="/" />
-                    </div>
-                  )}
-                  
-                  {!isSignedIn && (
-                    <>
-                      <Link
-                        href={"/sign-in"}
-                        className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-                      >
-                        Login
-                      </Link>
-                      <Link
-                        href={"/sign-up"}
-                        className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-                      >
-                        SignUp
-                      </Link>
-                    </>
-                  )}
-                </div>
-              )}
+            <SignedOut>
+              <SignInButton>
+                <button className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black">Login</button>
+              </SignInButton>
+              <SignUpButton>
+              <button className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black">Signin</button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
             </div>
             
             <button 
