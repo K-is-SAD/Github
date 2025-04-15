@@ -97,7 +97,7 @@ const Index = () => {
                 <button className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black">Login</button>
               </SignInButton>
               <SignUpButton>
-              <button className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black">Signin</button>
+              <button className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black">SignUp</button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>

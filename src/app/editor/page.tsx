@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
 import Grid from "@/components/grids/Index";
-import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "next/navigation";
 import {
@@ -19,7 +19,7 @@ interface Section {
   content: string;
   description?: string;
   order: number;
-  defaultContent?: string; // Added defaultContent property
+  defaultContent?: string;
 }
 
 interface TemplateData {
@@ -202,21 +202,21 @@ export default function EditorPage() {
   };
 
   return (
-    <div className="relative w-full min-h-screen">
+    <div className="relative w-full h-screen">
       <div className="absolute inset-0">
         <Grid />
       </div>
-      <div className="relative z-10 container mx-auto px-4 py-8 pt-24">
+      <div className="relative top-20 z-10 container mx-auto px-4">
         <div className="flex flex-col items-center justify-center mb-6">
           <div className="w-full max-w-4xl">
             <input
               type="text"
               value={title}
               onChange={(e) => handleTitleChange(e.target.value)}
-              className="w-full text-3xl font-bold mb-2 p-2 bg-transparent border-b border-gray-300 dark:border-gray-700 focus:outline-none focus:border-blue-500"
+              className="w-full text-3xl font-bold mb-2 p-2 bg-transparent border-b border-black dark:border-white focus:outline-none"
               placeholder="Document Title"
             />
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-black dark:text-white">
               {templateData?.description ||
                 "Create and edit markdown content for your documentation"}
             </p>
@@ -224,72 +224,8 @@ export default function EditorPage() {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 mb-4 max-w-7xl mx-auto">
-          {/* Sidebar - Repository Info and Sections */}
-          <div className="w-full lg:w-1/4">
-            <div className=" bg-transparent p-4 rounded-lg shadow mb-4 border-2 dark:border-white border-black">
-              <h2 className="text-lg font-semibold mb-3">Repository</h2>
-              <div className="flex mb-3">
-                <input
-                  type="text"
-                  value={repository}
-                  onChange={(e) => setRepository(e.target.value)}
-                  placeholder="Enter GitHub repository URL"
-                  className="w-full rounded-l-md p-2  focus:outline-none bg-transparent border-2 dark:border-white border-black"
-                />
-                <button
-                  onClick={handleGenerate}
-                  disabled={generating || !repository}
-                  className="bg-black dark:bg-white text-white dark:text-black rounded-r-md px-3 disabled:opacity-50 flex items-center justify-center"
-                >
-                  {generating ? (
-                    <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <IconBrandGithub size={20} />
-                  )}
-                </button>
-              </div>
-              {generating && (
-                <p className="text-xs text-gray-500 text-center">
-                  Analyzing repository...
-                </p>
-              )}
-            </div>
-
-            {/* Sections Navigation */}
-            <div className="bg-transparent border-2 dark:border-white border-black p-4 rounded-lg shadow">
-              <h2 className="text-lg font-semibold mb-3">Sections</h2>
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {sections.length > 0 ? (
-                  sections.map((section, index) => (
-                    <div
-                      key={index}
-                      onClick={() => setActiveSection(index)}
-                      className={`p-3 rounded-md cursor-pointer transition-colors ${
-                        activeSection === index
-                          ? "bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-500"
-                          : "hover:bg-gray-100 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      <h3 className="font-medium text-sm">{section.title}</h3>
-                      {section.description && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
-                          {section.description}
-                        </p>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-gray-500 dark:text-gray-400 py-2">
-                    No sections defined yet. Generate content from a repository
-                    or start editing.
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
           {/* Main Editor */}
-          <div className="w-full lg:w-3/4 flex flex-col">
+          <div className="w-full flex flex-col space-y-8">
             <div className="bg-transparent mb-4 flex justify-between items-center">
               <div className="text-sm">
                 {savedStatus && (
@@ -340,7 +276,7 @@ export default function EditorPage() {
                     onChange={(e) =>
                       handleSectionChange(activeSection, e.target.value)
                     }
-                     className="w-full h-[60vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow"
+                    className="w-full h-[50vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow"
                     placeholder={`Write content for ${
                       sections[activeSection]?.title || "this section"
                     }...`}
@@ -351,12 +287,12 @@ export default function EditorPage() {
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
-                  className="w-full h-[60vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow"
+                  className="w-full h-[50vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow"
                   placeholder="Start writing in markdown..."
                 />
               )
             ) : (
-              <div   className="w-full h-[60vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow">
+              <div className="w-full h-[50vh] p-4 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black  font-mono text-sm shadow">
                 <article className="prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg max-w-none">
                   <ReactMarkdown>
                     {content || "Nothing to preview yet."}
@@ -365,41 +301,43 @@ export default function EditorPage() {
               </div>
             )}
 
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between">
               <div className="flex space-x-4">
                 <button
-                   className="rounded-md dark:bg-white bg-black"
+                  className="rounded-md dark:bg-white bg-black"
                   onClick={() => setContent("")}
                 >
                   <span
-              className={` -translate-x-2 -translate-y-2 flex items-center justify-between  rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                    className={` -translate-x-2 -translate-y-2 flex items-center justify-between  rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
                 hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
                `}
-            >
-              <IconRefresh className="mr-1" size={16} /> Reset
-            </span>
+                  >
+                    <IconRefresh className="mr-1" size={16} /> Reset
+                  </span>
                 </button>
                 <button
                   className="rounded-md dark:bg-white bg-black"
                   onClick={handleExport}
                 >
                   <span
-              className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                    className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
                 hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
                `}
-            >
-             <IconDownload className="mr-1" size={16} /> Export
-            </span>
+                  >
+                    <IconDownload className="mr-1" size={16} /> Export
+                  </span>
                 </button>
               </div>
               <button
-               className="rounded-md dark:bg-white bg-black"
+                className="rounded-md dark:bg-white bg-black"
                 onClick={handleSave}
                 disabled={saving}
               >
-                <span className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                <span
+                  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
                 hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}>
+               `}
+                >
                   {saving ? (
                     <>
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
