@@ -152,27 +152,29 @@ const Dashboard = () => {
           <h2 className="text-xl text-center font-semibold">
             Generated Markdown Output
           </h2>
-          <div className="w-full h-96 p-3 rounded-lg overflow-auto bg-transparent">
-            {error && <p className="text-red-500">Error: {error}</p>}
+          <div className="w-full h-96 p-3 rounded-lg bg-transparent relative">
+            <div className="absolute inset-0 overflow-y-auto overflow-x-auto p-3">
+              {error && <p className="text-red-500">Error: {error}</p>}
 
-            {isLoading && (
-              <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
-            )}
+              {isLoading && (
+                <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+              )}
 
-            <ReactMarkdown>
-              {response && response !== "Processing your request..."
-                ? response
-                : response || "Your processed content will appear here"}
-            </ReactMarkdown>
+              <ReactMarkdown>
+                {response && response !== "Processing your request..."
+                  ? response
+                  : response || "Your processed content will appear here"}
+              </ReactMarkdown>
+            </div>
           </div>
           <button
             className="rounded-md dark:bg-white bg-black"
             onClick={handleCopy}
           >
             <span
-              className={`flex items-center gap-2  -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-                `}
+              className={`flex items-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+        hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+        `}
             >
               {copied ? <IconCheck size={20} /> : <IconCopy size={20} />}
               {copied ? "Copied!" : "Copy"}

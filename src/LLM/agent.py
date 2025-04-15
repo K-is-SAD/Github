@@ -42,11 +42,9 @@ def analyze_with_gemini(repo_summary, repo_tree, repo_content):
         client = genai.Client(api_key=GEMINI_API_KEY)
         content_chunks = split_into_chunks(repo_content, CHUNK_SIZE)
         
-        base_prompt = (
-            "You are analyzing a GitHub repository in parts. "
-            "First, understand the repository structure and key files.\n\n"
-            f"Repository Summary: {repo_summary}\n\n"
-            f"Repository Files: {repo_tree}\n\n"
+        base_prompt = GEMINI_BASE_PROMPT.format(
+            repo_summary=repo_summary,
+            repo_tree=repo_tree
         )
         
         responses = []
