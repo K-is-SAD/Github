@@ -138,4 +138,4 @@ async def main(github_repo_url:str):
     return result
 
 if __name__ == "__main__":
-    asyncio.run(main("https://github.com/K-is-SAD/Github/tree/dev"))
+    asyncio.run(main())
