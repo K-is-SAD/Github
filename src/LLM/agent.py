@@ -126,7 +126,7 @@ async def run_pipeline(github_url):
             "success": False
         }
 
-async def main(github_repo_url=str):
+async def main(github_repo_url:str):
     result = {}
     if github_repo_url == None or github_repo_url == "":
         result = {
@@ -140,4 +140,4 @@ async def main(github_repo_url=str):
     return result
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main("https://github.com/K-is-SAD/Github/tree/dev"))
