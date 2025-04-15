@@ -1,0 +1,5 @@
+gitingest
+google
+google-genai
+groq
+dotenv
