@@ -13,6 +13,7 @@ import {
   IconCheck,
   IconDownload,
 } from "@tabler/icons-react";
+import { convertToJSON } from "@/utils/jsonConverter";
 
 interface Section {
   title: string;
@@ -111,13 +112,19 @@ export default function EditorPage() {
 
     setGenerating(true);
     try {
-      const response = await fetch("/api/process-prompt", {
+      const response = await fetch("http://localhost:8000/api/summarise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubUrl: repository }),
+        body: JSON.stringify({ github_repo_url: repository }),
       });
 
       const data = await response.json();
+      console.log(data.repoMarkdown);
+
+      const repoMarkdown = await convertToJSON(data.repoMarkdown);
+      console.log(repoMarkdown);
+      
+
       if (response.ok) {
         setContent(data.repoMarkdown);
 

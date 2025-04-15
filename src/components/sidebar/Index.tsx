@@ -12,6 +12,7 @@ import {
 
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
+import { convertToJSON } from "@/utils/jsonConverter";
 
 const Index = () => {
   const links = [
@@ -83,20 +84,24 @@ const Dashboard = () => {
     setError("");
 
     try {
-      const apiResponse = await fetch("/api/process-prompt", {
+      const apiResponse = await fetch("http://localhost:8000/api/summarise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubUrl: repoUrl }),
+        body: JSON.stringify({ github_repo_url : repoUrl }),
       });
 
       const data = await apiResponse.json();
+      console.log(data.repoMarkdown);
+
+      const repoMarkdown = await convertToJSON(data.repoMarkdown);
+      console.log(repoMarkdown);
 
       if (!apiResponse.ok) {
         throw new Error(data.error || "Failed to process request");
       }
 
       if (data.success) {
-        setResponse(data.repoMarkdown);
+        setResponse(repoMarkdown);
       } else {
         throw new Error(data.error || "Processing failed");
       }
