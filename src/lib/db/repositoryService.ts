@@ -1,8 +1,9 @@
 import dbconnect from '../connectDatabase';
 import { Repository, User } from '@/models';
 import mongoose from 'mongoose';
-import { getAuth } from '@clerk/nextjs/server';
+import { auth, getAuth } from '@clerk/nextjs/server';
 import { NextApiRequest } from 'next';
+import RepoSummaryModel from '@/models/reposummary';
 
 //Saves a GitHub repository to the database
 export async function saveRepository(

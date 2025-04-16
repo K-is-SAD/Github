@@ -122,7 +122,7 @@ export default function EditorPage() {
       console.log(data.repoMarkdown);
 
       const repoMarkdown = await convertToJSON(data.repoMarkdown);
-      console.log(repoMarkdown);
+      console.log("REPOMARKDOWN IN EDITOR \n", repoMarkdown);
       
 
       if (response.ok) {

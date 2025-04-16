@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { convertToJSON } from "@/utils/jsonConverter";
+import { useUser } from "@clerk/nextjs";
 
 const Index = () => {
   const links = [
@@ -75,6 +76,15 @@ const Dashboard = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { user, isLoaded, isSignedIn } = useUser();
+
+  if (!isLoaded) {
+  return <div>Loading...</div>
+  }
+
+  if (!isSignedIn) {
+    return <div>Sign in to view this page</div>
+  }
 
   const handleSubmit = async () => {
     if (!repoUrl.trim()) return;
@@ -94,16 +104,43 @@ const Dashboard = () => {
       console.log(data.repoMarkdown);
 
       const repoMarkdown = await convertToJSON(data.repoMarkdown);
-      console.log(repoMarkdown);
+      console.log("REPOMARKDOWN IN SIDEBAR \n", repoMarkdown);
 
       if (!apiResponse.ok) {
         throw new Error(data.error || "Failed to process request");
       }
 
-      if (data.success) {
-        setResponse(repoMarkdown);
-      } else {
+      if (!data.success) {
         throw new Error(data.error || "Processing failed");
+      } else {
+        setResponse(data.repoMarkdown);
+
+        const body = {
+          userId : user?.id,
+          repoUrl : repoUrl,
+          files : repoMarkdown.files,
+          projectIdea : repoMarkdown.project_idea,
+          projectSummary : repoMarkdown.project_summary,
+          techStacks : repoMarkdown.tech_stack,
+          keyFeatures : repoMarkdown.key_features,
+          potentialIssues : repoMarkdown.potential_issues,
+          feasibility : repoMarkdown.feasibility
+        }
+        
+        const response = await fetch("/api/reposummary", {
+          method : "POST",
+          headers : {
+            'Content-Type' : 'application/json' 
+          },
+          body : JSON.stringify(body)
+        })
+
+        const result = await response.json();
+        if(result.success){
+          console.log("REPO SUMMARY CREATED SUCCESSFULLY!!")
+        }else{
+          throw new Error(result.message || "Error creating repo summary")
+        }
       }
     } catch (err) {
       setError(
