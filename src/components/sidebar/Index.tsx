@@ -101,7 +101,7 @@ const Dashboard = () => {
       }
 
       if (data.success) {
-        setResponse(repoMarkdown);
+        setResponse(data.repoMarkdown);
       } else {
         throw new Error(data.error || "Processing failed");
       }
