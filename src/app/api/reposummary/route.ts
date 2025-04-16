@@ -3,6 +3,9 @@ import { User } from "@/models";
 import RepoSummaryModel from "@/models/reposummary";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { generateEmbeddings } from "@/lib/db/generateEmbeddings";
+import { initialiseVectorIndex } from "@/lib/dbutils/vector-index";
+import { getQueryResults } from "@/lib/db/vectorSearch";
 
 export async function POST(req : NextRequest, res : NextResponse) {
     await dbconnect();
@@ -32,6 +35,24 @@ export async function POST(req : NextRequest, res : NextResponse) {
         const repoSummary = new RepoSummaryModel(body);
 
         await repoSummary.save();
+
+        const result = await generateEmbeddings(repoSummary.repoUrl, JSON.stringify(body));
+
+        if(!result) {
+            console.log("Error occurred while generating embeddings", result);
+            return NextResponse.json({success : false, message : "Error occurred while generating embeddings"}, {status : 500})
+        }
+
+        console.log("Embeddings generated successfully");
+        await initialiseVectorIndex();
+
+        const query = "Calculator addition function"; 
+        const documents = await getQueryResults(query);
+
+        console.log(`Search results for "${query}":`);
+        documents?.forEach((doc) => {
+            console.log(doc);
+        }); 
 
         return NextResponse.json({success : true, message : "Repo summary saved successfully", repoSummary : repoSummary}, {status : 200});
 

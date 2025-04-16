@@ -6,6 +6,11 @@ export interface IRepoFile{
     summary : string
 }
 
+export interface embeddingDocument{
+    pageContent? : string,
+    embeddings? : number[]
+}
+
 interface ITechStackData {
     [key: string]: string[]
 }
@@ -19,7 +24,8 @@ export interface RepoSummary extends Document{
     techStacks : ITechStackData,
     keyFeatures : string[],
     potentialIssues : string[],
-    feasibility : string
+    feasibility : string,
+    repoSummaryEmbeddings? : embeddingDocument[]
 }
 
 const RepoSummarySchema : Schema<RepoSummary> = new Schema({
@@ -37,7 +43,13 @@ const RepoSummarySchema : Schema<RepoSummary> = new Schema({
     techStacks : {type : Object, required : true},
     keyFeatures : [{type : String , required : true}],
     potentialIssues : [{type : String, required : true}],
-    feasibility : {type : String, required : true}
+    feasibility : {type : String, required : true},
+    repoSummaryEmbeddings : [
+        {
+            pageContent : {type : String},
+            embeddings : {type : [Number]}
+        }
+    ]
 },  {
     timestamps : true
 })
