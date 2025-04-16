@@ -1,7 +1,7 @@
 export const convertToJSON= async(inputString : string) => {
     let content = inputString;
     
-    // // Remove markdown code block markers if present
+    // Remove markdown code block markers if present
     if (inputString.startsWith('```')) {
         // Extract the content between the markers
         const firstLineEnd = inputString.indexOf('\n');

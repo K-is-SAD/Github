@@ -4,6 +4,7 @@ export interface IUser extends Document {
   clerkId: string;
   email: string;
   name?: string;
+  username : string;
   avatar?: string;
   githubUsername?: string;
   preferences: {
@@ -11,14 +12,13 @@ export interface IUser extends Document {
     darkMode: boolean;
     useAI: boolean;
   };
-  createdAt: Date;
-  updatedAt: Date;
 }
 
-const UserSchema: Schema = new Schema({
+const UserSchema: Schema<IUser> = new Schema({
   clerkId: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   name: { type: String },
+  username : { type: String, required : true},
   avatar: { type: String },
   githubUsername: { type: String },
   preferences: {
