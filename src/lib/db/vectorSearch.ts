@@ -41,14 +41,15 @@ export async function getQueryResults(userId : string, repoUrl : string, query :
             }
         ]
 
-        const result = await collection.aggregate(pipeline);
+        const cursor = collection.aggregate(pipeline);
+        const results = await cursor.toArray();
 
-        console.log("Results:", await result.toArray());
+        console.log("Results:", results);
         // for await (const doc of result) {
         //     console.dir(JSON.stringify(doc, null, 2));
         // }
 
-        return result.toArray();
+        return results;
 
     } catch (error) {
         console.log("Error occurred in Vector Search :", error);
