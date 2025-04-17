@@ -1,14 +1,10 @@
 import mongoose, {Schema, Document} from 'mongoose';
+import RepoEmbeddingModel from './repoEmbeddings';
 
 export interface IRepoFile{
     file_name : string,
     content : string,
     summary : string
-}
-
-export interface embeddingDocument{
-    pageContent? : string,
-    embeddings? : number[]
 }
 
 interface ITechStackData {
@@ -25,7 +21,6 @@ export interface RepoSummary extends Document{
     keyFeatures : string[],
     potentialIssues : string[],
     feasibility : string,
-    repoSummaryEmbeddings? : embeddingDocument[]
 }
 
 const RepoSummarySchema : Schema<RepoSummary> = new Schema({
@@ -44,14 +39,26 @@ const RepoSummarySchema : Schema<RepoSummary> = new Schema({
     keyFeatures : [{type : String , required : true}],
     potentialIssues : [{type : String, required : true}],
     feasibility : {type : String, required : true},
-    repoSummaryEmbeddings : [
-        {
-            pageContent : {type : String},
-            embeddings : {type : [Number]}
-        }
-    ]
 },  {
     timestamps : true
+})
+
+RepoSummarySchema.post('findOneAndDelete', async(result, next)=>{
+    console.log("RepoSummary deleted successfully", result);
+
+    // const existingRepoEmbedding = await RepoEmbeddingModel.findOne({
+    //     repoUrl : result.repoUrl,
+    //     userId : result.userId
+    // })
+    // if(existingRepoEmbedding){
+    //     const deletedRepoEmbedding = await RepoEmbeddingModel.findOneAndDelete({
+    //         repoUrl : result.repoUrl,  
+    //         userId : result.userId
+    //     })
+    //     console.log("RepoEmbedding deleted successfully", deletedRepoEmbedding);
+    // }
+
+    next();
 })
 
 const RepoSummaryModel = mongoose.models.RepoSummaryModel as mongoose.Model<RepoSummary> || mongoose.model<RepoSummary>('RepoSummaryModel', RepoSummarySchema);

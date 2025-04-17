@@ -1,14 +1,14 @@
 import { MongoClient } from "mongodb";
 import getEmbeddings from "../dbutils/getEmbeddings";
 
-export async function getQueryResults(query : string){
+export async function getQueryResults(userId : string, repoUrl : string, query : string){
     const client = new MongoClient(process.env.MONGODB_URI as string);
 
     try {
         await client.connect();
 
         const db = client.db("github-promax");
-        const collection = db.collection("reposummarymodels");        
+        const collection = db.collection("repoembeddingmodels");        
         
         const queryVector = await getEmbeddings(query);
 
@@ -17,15 +17,25 @@ export async function getQueryResults(query : string){
                 "$vectorSearch" : {
                     "index" : "repoSummaryVectorIndex",
                     "queryVector" : queryVector,
-                    "path" : "repoSummaryEmbeddings.embeddings",
+                    "path" : "embeddings",
+                    "filter" : {
+                        "$and" : [
+                            {
+                                "repoUrl" : repoUrl,
+                            },
+                            {
+                                "userId" : userId,
+                            }
+                        ]
+                    },
                     "numCandidates" : 150,
                     "limit" : 10
                 }
             },
             {
                 $project : {
-                    "_id" : 0,
-                    "document.pageContent" : 1,
+                    "repoUrl" : "$repoUrl",
+                    "pageContent" : "$pageContent", 
                     "score" : { "$meta": "vectorSearchScore" }
                 }
             }
@@ -33,20 +43,15 @@ export async function getQueryResults(query : string){
 
         const result = await collection.aggregate(pipeline);
 
-        console.log("Results:");
+        console.log("Results:", await result.toArray());
         // for await (const doc of result) {
         //     console.dir(JSON.stringify(doc, null, 2));
         // }
 
-        const arrayOfQueryDocs = [];
-        for await (const doc of result) {
-            arrayOfQueryDocs.push(doc);
-        }
-
-        return arrayOfQueryDocs;
+        return await result.toArray();
 
     } catch (error) {
-        console.log("Error occurred:", error);
+        console.log("Error occurred in Vector Search :", error);
     } finally {
         await client.close();
     }

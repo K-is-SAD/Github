@@ -7,7 +7,7 @@ export async function initialiseVectorIndex() {
         await client.connect();
 
         const database = client.db("github-promax");
-        const collection = database.collection("reposummarymodels");
+        const collection = database.collection("repoembeddingmodels");
 
         const allIndexes = await collection.listSearchIndexes();
         for await (const index of allIndexes) {
@@ -25,8 +25,16 @@ export async function initialiseVectorIndex() {
                 {
                     "type": "vector",
                     "numDimensions": 768,
-                    "path": "repoSummaryEmbeddings.embeddings",
+                    "path": "embeddings",
                     "similarity": "cosine"
+                },
+                {
+                    "type" : "filter",
+                    "path" : "repoUrl"
+                },
+                {
+                    "type" : "filter",
+                    "path" : "userId"
                 }
                 ]
             }
@@ -35,23 +43,23 @@ export async function initialiseVectorIndex() {
         const result = await collection.createSearchIndex(index); 
         console.log(`New search index named ${result} is building.`);
 
-        // // wait for the index to be ready to query
-        // console.log("Polling to check if the index is ready. This may take up to a minute.")
-        // let isQueryable = false;
-        // while (!isQueryable) {
-        // const allIndexes = await collection.listSearchIndexes(); //lists all the vector search indexes of that collection
-        // for await (const index of allIndexes) {
-        //     console.log(index);
-        //     if (index.name === result) {
-        //     if (index.queryable) {
-        //         console.log(`${result} is ready for querying.`);
-        //         isQueryable = true;
-        //     } else {
-        //         await new Promise(resolve => setTimeout(resolve, 5000));
-        //     }
-        //     }
-        // }
-        // }
+        // wait for the index to be ready to query
+        console.log("Polling to check if the index is ready. This may take up to a minute.")
+        let isQueryable = false;
+        while (!isQueryable) {
+        const allIndexes = await collection.listSearchIndexes(); //lists all the vector search indexes of that collection
+        for await (const index of allIndexes) {
+            console.log(index);
+            if (index.name === result) {
+                if (index.queryable) {
+                    console.log(`${result} is ready for querying.`);
+                    isQueryable = true;
+            } else {
+                await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+            }
+        }
+        }
 
     } catch(error){
         console.error("Error occurred: ", error);

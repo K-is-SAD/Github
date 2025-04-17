@@ -1,14 +1,3 @@
-// import { VertexAIEmbeddings } from "@langchain/google-vertexai";
-
-// const embeddings = new VertexAIEmbeddings({
-//   model: "text-embedding-004"
-// });
-
-// export default async function getEmbeddings(text: string) {
-//   const embedding = await embeddings.embedQuery(text);
-//   return embedding;
-// }
-
 import axios from 'axios'
 
 export default async function getEmbeddings(data:string){

@@ -8,6 +8,7 @@ import {
   IconUserBolt,
   IconCopy,
   IconCheck,
+  IconTrash,
 } from "@tabler/icons-react";
 
 import { cn } from "@/lib/utils";
@@ -75,15 +76,17 @@ const Dashboard = () => {
   const [response, setResponse] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
   const { user, isLoaded, isSignedIn } = useUser();
 
   if (!isLoaded) {
-  return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   if (!isSignedIn) {
-    return <div>Sign in to view this page</div>
+    return <div>Sign in to view this page</div>;
   }
 
   const handleSubmit = async () => {
@@ -97,7 +100,7 @@ const Dashboard = () => {
       const apiResponse = await fetch("http://localhost:8000/api/summarise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ github_repo_url : repoUrl }),
+        body: JSON.stringify({ github_repo_url: repoUrl }),
       });
 
       const data = await apiResponse.json();
@@ -116,30 +119,30 @@ const Dashboard = () => {
         setResponse(data.repoMarkdown);
 
         const body = {
-          userId : user?.id,
-          repoUrl : repoUrl,
-          files : repoMarkdown.files,
-          projectIdea : repoMarkdown.project_idea,
-          projectSummary : repoMarkdown.project_summary,
-          techStacks : repoMarkdown.tech_stack,
-          keyFeatures : repoMarkdown.key_features,
-          potentialIssues : repoMarkdown.potential_issues,
-          feasibility : repoMarkdown.feasibility
-        }
-        
+          userId: user?.id,
+          repoUrl: repoUrl,
+          files: repoMarkdown.files,
+          projectIdea: repoMarkdown.project_idea,
+          projectSummary: repoMarkdown.project_summary,
+          techStacks: repoMarkdown.tech_stack,
+          keyFeatures: repoMarkdown.key_features,
+          potentialIssues: repoMarkdown.potential_issues,
+          feasibility: repoMarkdown.feasibility,
+        };
+
         const response = await fetch("/api/reposummary", {
-          method : "POST",
-          headers : {
-            'Content-Type' : 'application/json' 
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-          body : JSON.stringify(body)
-        })
+          body: JSON.stringify(body),
+        });
 
         const result = await response.json();
-        if(result.success){
-          console.log("REPO SUMMARY CREATED SUCCESSFULLY!!")
-        }else{
-          throw new Error(result.message || "Error creating repo summary")
+        if (result.success) {
+          console.log("REPO SUMMARY CREATED SUCCESSFULLY!!");
+        } else {
+          throw new Error(result.message || "Error creating repo summary");
         }
       }
     } catch (err) {
@@ -149,6 +152,55 @@ const Dashboard = () => {
       setResponse("");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!repoUrl.trim()) {
+      setError("Please enter a repository URL to delete");
+      return;
+    }
+
+    setIsDeleting(true);
+    setError("");
+    setDeleteSuccess(false);
+
+    try {
+      const deleteResponse = await fetch("/api/reposummary", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl }),
+      });
+
+      const result = await deleteResponse.json();
+
+      if (!deleteResponse.ok) {
+        throw new Error(result.error || "Failed to delete repository");
+      }
+
+      if (result.success) {
+        setDeleteSuccess(true);
+        setResponse("");
+        console.log("Repository deleted successfully");
+        // Optional: Clear the input field after successful deletion
+        // setRepoUrl("");
+      } else {
+        throw new Error(result.message || "Failed to delete repository");
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "An unknown error occurred during deletion"
+      );
+    } finally {
+      setIsDeleting(false);
+      // Hide the success message after 3 seconds
+      if (deleteSuccess) {
+        setTimeout(() => setDeleteSuccess(false), 3000);
+      }
     }
   };
 
@@ -175,18 +227,51 @@ const Dashboard = () => {
             className="w-full h-96 p-3 rounded-lg focus:border-none focus:outline-none"
             placeholder="Enter GitHub repo URL (only) here..."
           />
-          <button
-            className="rounded-md dark:bg-white bg-black"
-            onClick={handleSubmit}
-          >
-            <span
-              className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
+          <div className="flex gap-4 w-full justify-center">
+            <button
+              className="rounded-md dark:bg-white bg-black"
+              onClick={handleSubmit}
+              disabled={isLoading || isDeleting}
             >
-              {isLoading ? "Analyzing..." : "Analyze Repo"}
-            </span>
-          </button>
+              <span
+                className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                  ${
+                    isLoading || isDeleting
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }
+                `}
+              >
+                {isLoading ? "Analyzing..." : "Analyze Repo"}
+              </span>
+            </button>
+
+            <button
+              className="rounded-md dark:bg-red-500 bg-red-500"
+              onClick={handleDelete}
+              disabled={isLoading || isDeleting}
+            >
+              <span
+                className={`flex items-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 border-red-500 dark:bg-black bg-white p-4 text-xl  
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                  ${
+                    isLoading || isDeleting
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }
+                  ${deleteSuccess ? "bg-green-100" : ""}
+                `}
+              >
+                <IconTrash size={20} className="text-red-500" />
+                {isDeleting
+                  ? "Deleting..."
+                  : deleteSuccess
+                  ? "Deleted!"
+                  : "Delete Repo"}
+              </span>
+            </button>
+          </div>
         </div>
         <div className="border-r-1 dark:border-white border-black h-full" />
 
@@ -197,6 +282,11 @@ const Dashboard = () => {
           <div className="w-full h-96 p-3 rounded-lg bg-transparent relative">
             <div className="absolute inset-0 overflow-y-auto overflow-x-auto p-3">
               {error && <p className="text-red-500">Error: {error}</p>}
+              {deleteSuccess && (
+                <p className="text-green-500">
+                  Repository deleted successfully!
+                </p>
+              )}
 
               {isLoading && (
                 <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
@@ -212,11 +302,17 @@ const Dashboard = () => {
           <button
             className="rounded-md dark:bg-white bg-black"
             onClick={handleCopy}
+            disabled={!response || response === "Processing your request..."}
           >
             <span
               className={`flex items-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-        hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-        `}
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                ${
+                  !response || response === "Processing your request..."
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }
+              `}
             >
               {copied ? <IconCheck size={20} /> : <IconCopy size={20} />}
               {copied ? "Copied!" : "Copy"}
