@@ -16,7 +16,7 @@ const RepoEmbeddingSchema : Schema<RepoEmbedding> = new Schema({
     timestamps : true
 })
 
-RepoEmbeddingSchema.post('findOneAndDelete', async(result, next)=>{
+RepoEmbeddingSchema.post('deleteMany', async(result, next)=>{
     console.log("RepoEmbedding deleted successfully", result);
     next();
 });

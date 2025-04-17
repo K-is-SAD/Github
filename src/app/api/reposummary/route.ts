@@ -67,6 +67,9 @@ export async function POST(req : NextRequest, res : NextResponse) {
         const documents = await getQueryResults(repoSummary.userId, repoSummary.repoUrl, query);
 
         console.log(`Search results for "${query}":`);
+        if(!documents || documents.length === 0) {
+            console.log("No documents found for the query");
+        }
         documents?.forEach((doc) => {
             console.log(doc);
         }); 
@@ -106,7 +109,8 @@ export async function DELETE(req : NextRequest, res : NextResponse){
             return NextResponse.json({success : false, message : "Repo summary does not exists"}, {status : 200})
         }
 
-        const deletedRepoSummary = await RepoSummaryModel.deleteOne({
+        //deleting the reposummary 
+        const deletedRepoSummary = await RepoSummaryModel.findOneAndDelete({
             userId : user.clerkId,
             repoUrl : body.repoUrl
         })

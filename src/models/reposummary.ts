@@ -46,17 +46,18 @@ const RepoSummarySchema : Schema<RepoSummary> = new Schema({
 RepoSummarySchema.post('findOneAndDelete', async(result, next)=>{
     console.log("RepoSummary deleted successfully", result);
 
-    // const existingRepoEmbedding = await RepoEmbeddingModel.findOne({
-    //     repoUrl : result.repoUrl,
-    //     userId : result.userId
-    // })
-    // if(existingRepoEmbedding){
-    //     const deletedRepoEmbedding = await RepoEmbeddingModel.findOneAndDelete({
-    //         repoUrl : result.repoUrl,  
-    //         userId : result.userId
-    //     })
-    //     console.log("RepoEmbedding deleted successfully", deletedRepoEmbedding);
-    // }
+    //also deleting the repo embeddings associated with the repo summary
+    const existingRepoEmbedding = await RepoEmbeddingModel.findOne({
+        repoUrl : result.repoUrl,
+        userId : result.userId
+    })
+    if(existingRepoEmbedding){
+        const deletedRepoEmbedding = await RepoEmbeddingModel.deleteMany({
+            repoUrl : result.repoUrl,  
+            userId : result.userId
+        })
+        console.log("RepoEmbedding deleted successfully", deletedRepoEmbedding);
+    }
 
     next();
 })

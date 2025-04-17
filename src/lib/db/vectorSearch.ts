@@ -48,7 +48,7 @@ export async function getQueryResults(userId : string, repoUrl : string, query :
         //     console.dir(JSON.stringify(doc, null, 2));
         // }
 
-        return await result.toArray();
+        return result.toArray();
 
     } catch (error) {
         console.log("Error occurred in Vector Search :", error);
