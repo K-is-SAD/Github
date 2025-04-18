@@ -7,30 +7,34 @@ import Image from "next/image";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 
 const navlinks: any[] = [
+  
+  {
+    name: "Summary",
+    href: "/codebase",
+  },
   {
     name: "Chat",
     href: "/chat",
   },
   {
-    name: "Query",
-    href: "/codebase",
-  },
-  {
-    name: "Pricing",
-    href: "/pricing",
+    name:"Generation",
+    href: "/readme"
   },
   {
     name:"Editor",
     href: "/editor"
   },
-
-  {
-    name:"Templates",
-    href: "/templates"
-  },
   {
     name:"Profile",
     href:"/profile"
+  },
+  {
+    name:"FAQs",
+    href:"/faqs"
+  },
+  {
+    name: "Pricing",
+    href: "/pricing",
   }
 ];
 
