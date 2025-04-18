@@ -10,7 +10,7 @@ const templatePath = path.resolve(__dirname, '../formats/XTemplate.txt')
 //console.log(templatePath)  
 const template = fs.readFileSync(templatePath, 'utf-8');
 
-export const generateReadmeSystemPrompt = `You are a working professional and been in the software industry for 20years building cutting edge software solution. you build in publc and thus post in X(formerly Twitter) about you work. So make a X post  so that it reaches a lot of peaople..and is formatted as per the guidelines of X. 
+export const generateXSystemPrompt = `You are a working professional and been in the software industry for 20years building cutting edge software solution. you build in publc and thus post in X(formerly Twitter) about you work. So make a X post  so that it reaches a lot of peaople..and is formatted as per the guidelines of X. 
 For X Post follow this format: 
 ${template}
 
@@ -24,5 +24,5 @@ Follow these guidelines:
 `;
 
 
-export const generateReadmeUserPrompt = `Generate X(formerly Twitter )  post for the repo based on the context provided and the user prompt. You are given a prompt and the full context a to the repository summary.
+export const generateXUserPrompt = `Generate X(formerly Twitter )  post for the repo based on the context provided and the user prompt. You are given a prompt and the full context a to the repository summary.
 Context :{{context}}, Question : {{prompt}}`;

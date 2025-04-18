@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-import { generateReadmeUserPrompt , generateReadmeSystemPrompt} from "@/prompts/generateReadme_prompt";
+import { generateLinkedInSystemPrompt, generateLinkedInUserPrompt } from "@/prompts/generateLinkedIn_prompt";
 
 export const generateLinkedin = async(context : string, prompt : string)=>{
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -9,11 +9,11 @@ export const generateLinkedin = async(context : string, prompt : string)=>{
     messages : [
         {
         role : 'system',
-        content : generateReadmeSystemPrompt,
+        content : generateLinkedInSystemPrompt,
         },
         {
         role: "user",
-        content: generateReadmeUserPrompt.replace("{{context}}", context).replace("{{prompt}}", prompt),
+        content: generateLinkedInUserPrompt.replace("{{context}}", context).replace("{{prompt}}", prompt),
         },
     ],
     });

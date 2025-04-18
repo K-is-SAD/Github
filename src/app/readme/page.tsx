@@ -64,19 +64,52 @@ const ReadmePage = () => {
     
     try {
       // Call the API endpoint
-      // const response = await fetch(`/api/readme-content/${encodeURIComponent(repoUrl)}`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     repoUrl,
-      //     message : input,
-      //   }),
-      // });
+      // const response = await fetch(
+      //   `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       repoUrl,
+      //       message: input,
+      //     }),
+      //   }
+      // );
 
+      //getting latest contents and last content
+      // const response = await fetch(
+      //   `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+
+      // const result = await response.json();
+      // console.log(result);
+
+      //api testing for deletion of a particular content
+      // const response2 = await fetch(
+      //   `/api/readme-content`,
+      //   {
+      //     method: "DELETE",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       repoUrl,
+      //       content : result.data
+      //     }),
+      //   }
+      // );
+
+      //getting all repos
       const response = await fetch(
-        `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+        `/api/allrepos`,
         {
           method: "GET",
           headers: {
@@ -85,37 +118,20 @@ const ReadmePage = () => {
         }
       );
 
-      const result = await response.json();
-      console.log(result);
-
-      const response2 = await fetch(
-        `/api/readme-content`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            repoUrl,
-            content : result.data
-          }),
-        }
-      );
-      
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
       }
-      
+
       const data = await response.json();
-      
+
       // Add assistant message to chat
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.content
+        content: data.content,
       };
-      
-      setMessages(prev => [...prev, assistantMessage]);
+
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('An unknown error occurred'));
     } finally {
