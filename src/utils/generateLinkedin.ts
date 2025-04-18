@@ -1,7 +1,7 @@
 import Groq from "groq-sdk";
 import { generateReadmeUserPrompt , generateReadmeSystemPrompt} from "@/prompts/generateReadme_prompt";
 
-export const generateReadme = async(context : string, prompt : string)=>{
+export const generateLinkedin = async(context : string, prompt : string)=>{
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
     const chatCompletions = await groq.chat.completions.create({

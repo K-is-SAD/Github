@@ -1,18 +1,19 @@
 import Groq from "groq-sdk";
-import { findKeywordsSystemPrompt, findKeywordsUserPrompt } from '../prompts/findkeywords_prompt';
+
+import { getCategorySystemPrompt, getCategoryUserPrompt } from "@/prompts/getCategory_prompt";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export async function getKeywords(text : string) {
+export async function getCategory(text : string) {
   const chatCompletions = await groq.chat.completions.create({
     messages: [
       {
         role : "system",
-        content : findKeywordsSystemPrompt,
+        content : getCategorySystemPrompt,
       },
       {
         role: "user",
-        content: findKeywordsUserPrompt.replace("{{text}}", text),
+        content: getCategoryUserPrompt.replace("{{text}}", text),
       },
     ],
     model: "llama-3.3-70b-versatile",

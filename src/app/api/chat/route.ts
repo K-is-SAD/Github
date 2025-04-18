@@ -1,7 +1,7 @@
 import dbconnect from '@/lib/connectDatabase';
 import { getQueryResults } from '@/lib/db/vectorSearch';
 import { initialiseVectorIndex } from '@/lib/dbutils/vector-index';
-import { User } from "@/models";
+import User from "@/models/User";
 import RepoSummaryModel from '@/models/reposummary';
 import { getKeywords } from '@/utils/findkeywords';
 import { groq } from '@ai-sdk/groq';

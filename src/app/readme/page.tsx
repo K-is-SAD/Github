@@ -70,7 +70,7 @@ const ReadmePage = () => {
         },
         body: JSON.stringify({
           repoUrl,
-          message: input,
+          message : input,
         }),
       });
       
@@ -84,7 +84,7 @@ const ReadmePage = () => {
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: data.content || data.message
+        content: data.content
       };
       
       setMessages(prev => [...prev, assistantMessage]);

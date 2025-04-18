@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readmeContentService } from '@/lib/db';
 import dbconnect from '@/lib/connectDatabase';
 import { auth } from '@clerk/nextjs/server';
-import { User } from '@/models';
 import RepoSummaryModel from '@/models/reposummary';
 import { generateReadme } from '@/utils/generateReadme';
-import { streamText } from 'ai';
-// import { groq } from '@ai-sdk/groq';
-import Groq from "groq-sdk";
-const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+import { getCategory } from '@/utils/getCategory';
+import User from '@/models/User';
+import { deleteReadmeContent, saveReadmeContent } from '@/lib/db/readmeContentService';
+import { generateArticle } from '@/utils/generateArticle';
+import { generateTweet } from '@/utils/generateTweet';
 
 interface RouteParams {
   params : {
@@ -21,8 +20,8 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
   try {
     const { id } = await params; //id -> repoUrl
-    const { repoUrl, messages } = await request.json();
-    const prompt = messages[messages.length - 1].content;
+    const { repoUrl, message } = await request.json();
+    const prompt = message;
     console.log("Received prompt for generating readme : ", prompt);
     console.log("Received repoUrl : ", repoUrl);
 
@@ -50,66 +49,26 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
     const fullContext = JSON.stringify(existingRepoSummary);
 
-    // const result = streamText({
-    //   model: groq('llama-3.3-70b-versatile'),
-    //   messages : [
-    //       {
-    //       role : 'system',
-    //       content : `You are an efficient LLM that can answer questions about the codebase. You are also a helpful assistant that can help with any other questions regarding codes and codebases or related to codebases. You have to generate a Readme or provide a linkedIn post content for the repository provided by the user. The readme must be in markdown format, the readme must be of the format of an actual readme. The linkedIn post must also be genuine like an actual LinkedIn post. Dont provide unnecessary information.`,
-    //       },
-    //       {
-    //       role: "user",
-    //       content: `Generate a readme or a linkedIn post for the repo based on the context provided and the user prompt. You are given a prompt and the full context to the repository summary."
-    //       Context :${fullContext}, Question : ${prompt}`,
-    //       },
-    //   ],
-    // });
+    let content = "";
 
-    // console.log("Result : ", result.toDataStreamResponse())
-
-    // return result.toDataStreamResponse({
-    // getErrorMessage: error => {
-    //     if (error == null) {
-    //     return 'unknown error';
-    //     }
-
-    //     if (typeof error === 'string') {
-    //     return error;
-    //     }
-
-    //     if (error instanceof Error) {
-    //     return error.message;
-    //     }
-
-    //     return JSON.stringify(error);
-    // }
-    // });
-
-    const getRreadmeStream = async()=>{
-      return groq.chat.completions.create({
-      model: 'llama-3.3-70b-versatile',
-      messages : [
-          {
-          role : 'system',
-          content : `You are an efficient LLM that can answer questions about the codebase. You are also a helpful assistant that can help with any other questions regarding codes and codebases or related to codebases. You have to generate a Readme or provide a linkedIn post content for the repository provided by the user. The readme must be in markdown format, the readme must be of the format of an actual readme. The linkedIn post must also be genuine like an actual LinkedIn post. Dont provide unnecessary information.`,
-          },
-          {
-          role: "user",
-          content: `Generate a readme or a linkedIn post for the repo based on the context provided and the user prompt. You are given a prompt and the full context to the repository summary."
-          Context :${fullContext}, Question : ${prompt}`,
-          },
-      ],
-      stream : true
-      });
+    const category = await getCategory(prompt);
+    if(category === "Readme"){
+      content = await generateReadme(fullContext, prompt);
+    }else if(category === "Article"){
+      content = await generateArticle(fullContext, prompt);
+    }else if(category === "Tweet"){
+      content = await generateTweet(fullContext, prompt);
+    }else if(category === "LinkedIn"){
+      content = await generateTweet(fullContext, prompt);
+    }else{
+      content = await generateReadme(fullContext, prompt);
     }
-    
-    const readmeStream = await getRreadmeStream();
-    console.log("Readme stream : ", readmeStream)
 
-    for await (const chunk of readmeStream){
-      console.log()
-      return new NextResponse(chunk.choices[0]?.delta?.content || "")
-    }
+    console.log("Category of generation : ", category);
+
+    const result = await saveReadmeContent(repoUrl, userId, content, category, false); 
+
+    return NextResponse.json({content : content}, { status: 200 });
 
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -124,8 +83,21 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
-    const { id } = params;
-    const result = await readmeContentService.deleteReadmeContent(request, id);
+    const { repoUrl, content } = await request.json();
+
+    const {userId} : {userId : string | null | undefined} = await auth();
+    
+    if (!userId) {
+    throw new Error('Not authenticated');
+    }
+    console.log(userId);
+
+    const user = await User.findOne({ clerkId: userId });
+    if (!user) {
+        throw new Error('User not found in database');
+    }
+
+    const result = await deleteReadmeContent(repoUrl, userId, content);
     return NextResponse.json(result, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
