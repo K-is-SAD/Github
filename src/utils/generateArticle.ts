@@ -1,5 +1,5 @@
 import Groq from "groq-sdk";
-import { generateReadmeUserPrompt , generateReadmeSystemPrompt} from "@/prompts/generateReadme_prompt";
+import { generateArticleSystemPrompt, generateArticleUserPrompt } from "@/prompts/generateArticle_pompt";
 
 export const generateArticle = async(context : string, prompt : string)=>{
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -9,11 +9,11 @@ export const generateArticle = async(context : string, prompt : string)=>{
     messages : [
         {
         role : 'system',
-        content : generateReadmeSystemPrompt,
+        content : generateArticleSystemPrompt,
         },
         {
         role: "user",
-        content: generateReadmeUserPrompt.replace("{{context}}", context).replace("{{prompt}}", prompt),
+        content: generateArticleUserPrompt.replace("{{context}}", context).replace("{{prompt}}", prompt),
         },
     ],
     });

@@ -1,9 +1,17 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-// Read the template file
-const templatePath = "C:/Users/sayan/OneDrive/Desktop/Github/src/formats/readmeTemplate.md";   
+// emulate __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+const templatePath = path.resolve(__dirname, '../formats/readmeTemplate.md')
+//console.log(templatePath)
+
+
 const template = fs.readFileSync(templatePath, 'utf-8');
+//console.log(template);
 
 export const generateReadmeSystemPrompt = `You are a professional documentation specialist with expertise in creating high-quality GitHub repository documentation. Your task is to generate comprehensive, well-structured README files or engaging social media content for code repositories.
 
@@ -21,5 +29,5 @@ Follow these guidelines:
 `;
 
 
-export const generateReadmeUserPrompt = `Generate a readme or a linkedIn post for the repo based on the context provided and the user prompt. You are given a prompt and the full context to the repository summary.
-Context :{{context}}, Question : {{prompt}}`;
+export const generateReadmeUserPrompt = `Generate a readme  post for the repo based on the context provided and the user prompt. You are given a prompt and the full context to the repository summary.
+Context :{{context}}, Question : {{prompt}}`; 
