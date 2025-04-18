@@ -1,6 +1,5 @@
+import { saveReadmeContent } from '@/lib/db/readmeContentService';
 import { NextRequest, NextResponse } from 'next/server';
-import { readmeContentService } from '@/lib/db';
-
 /**
  * POST endpoint to save readme content for a repository
  */
@@ -15,7 +14,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    const readmeContent = await readmeContentService.saveReadmeContent(
+    const readmeContent = await saveReadmeContent(
       request,
       repositoryId,
       {
