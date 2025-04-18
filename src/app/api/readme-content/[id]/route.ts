@@ -107,6 +107,7 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
     console.log("Readme stream : ", readmeStream)
 
     for await (const chunk of readmeStream){
+      console.log()
       return new NextResponse(chunk.choices[0]?.delta?.content || "")
     }
 
