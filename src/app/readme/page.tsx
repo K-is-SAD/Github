@@ -1,15 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useRef, useEffect } from "react";
-import { Send, Trash } from "lucide-react";
+import React, { useRef, useEffect, useState } from "react";
+import { Send, Trash, Link } from "lucide-react";
 import Grid from "@/components/grids/Index";
 import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
 
-const ChatPage = () => {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat();
+const ReadmePage = () => {
+  const [repoUrl, setRepoUrl] = useState<string>("");
+  const [showRepoInput, setShowRepoInput] = useState<boolean>(false);
+
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit: originalHandleSubmit,
+    status,
+    stop,
+    isLoading,
+    error,
+    reload,
+  } = useChat({
+    api: `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+    body: {
+      repoUrl: repoUrl,
+    },
+  });
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -20,6 +38,11 @@ const ChatPage = () => {
     window.location.reload();
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    originalHandleSubmit(e);
+  };
+
   return (
     <div className="relative h-screen w-full overflow-hidden px-4">
       <div className="absolute inset-0 w-full h-full">
@@ -27,6 +50,47 @@ const ChatPage = () => {
       </div>
 
       <div className="relative top-24 z-10 flex flex-col h-[40rem] max-w-4xl mx-auto">
+        
+        <div className="mb-4 flex items-center">
+          <button
+            onClick={() => setShowRepoInput(!showRepoInput)}
+            className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
+          >
+            <Link size={16} />
+            {showRepoInput ? "Hide Repo URL" : "Set Repository URL"}
+          </button>
+
+          {repoUrl && (
+            <div className="ml-4 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm flex items-center">
+              <span className="truncate max-w-[200px]">{repoUrl}</span>
+              <button
+                className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                onClick={() => setRepoUrl("")}
+              >
+                ×
+              </button>
+            </div>
+          )}
+        </div>
+
+        {showRepoInput && (
+          <div className="mb-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={repoUrl}
+                onChange={(e) => setRepoUrl(e.target.value)}
+                placeholder="Enter GitHub repository URL"
+                className="w-full px-4 py-2 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent bg-transparent dark:text-white text-black"
+              />
+            </div>
+            <p className="text-xs dark:text-white text-black mt-1">
+              Adding a repository URL helps provide context for
+              repository-specific questions
+            </p>
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto h-96 p-4 md:p-6 border dark:border-white border-black rounded-lg">
           <div>
             {messages.length === 0 ? (
@@ -38,7 +102,8 @@ const ChatPage = () => {
                   How can I help you today?
                 </h2>
                 <p className="text-sm max-w-md">
-                  Ask me anything and I&apos;ll do my best to assist you.
+                  Ask me anything about your repository and I&apos;ll do my best
+                  to assist you.
                 </p>
               </div>
             ) : (
@@ -82,9 +147,34 @@ const ChatPage = () => {
         <div className="bg-transparent p-4">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit} className="relative">
+              {error && (
+                <>
+                  <div>An error occurred.</div>
+                  <button type="button" onClick={() => reload()}>
+                    Retry
+                  </button>
+                </>
+              )}
+
+              {(status === "submitted" || status === "streaming") && (
+                <div>
+                  {status === "submitted" && (
+                    <div className="flex space-x-2">
+                      <span className="animate-bounce">•</span>
+                      <span className="animate-bounce delay-75">•</span>
+                      <span className="animate-bounce delay-150">•</span>
+                    </div>
+                  )}
+                  <button type="button" onClick={() => stop()}>
+                    Stop
+                  </button>
+                </div>
+              )}
+
               <textarea
                 value={input}
                 onChange={handleInputChange}
+                disabled={status !== "ready"}
                 placeholder="Type your message..."
                 className="w-full h-20 px-4 py-3 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent resize-none overflow-auto bg-transparent dark:text-white text-black"
                 rows={1}
@@ -103,9 +193,18 @@ const ChatPage = () => {
                 <Send size={20} />
               </button>
             </form>
-            <p className="text-xs dark:text-white text-black mt-2 text-center">
-              Press Enter to send, Shift+Enter for new line
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <button
+                onClick={clearChat}
+                className="text-xs flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <Trash size={14} />
+                Clear chat
+              </button>
+              <p className="text-xs dark:text-white text-black text-center">
+                Press Enter to send, Shift+Enter for new line
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -113,4 +212,4 @@ const ChatPage = () => {
   );
 };
 
-export default ChatPage;
+export default ReadmePage;

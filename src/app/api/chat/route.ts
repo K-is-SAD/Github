@@ -67,7 +67,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const result = streamText({
       model: groq('llama-3.3-70b-versatile'),
-      // system : `You are an efficient LLM that can answer questions about the codebase. You are also a helpful assistant that can help with any other questions. You will be given a question and a context in the prompt. You need to answer the question based on the context. If the user's question does not match that much with the context, you may use your own knowledge to answer the question. You are not allowed to use the context to answer the question if the question does not match that much with the context. But give a good impactful response. At the end of the response, you need to say "I am here to help you with anything else."`,
       messages : [
         {
           role : 'system',
@@ -80,6 +79,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
         },
       ]
     });
+
+    console.log("Result : ", result);
 
     return result.toDataStreamResponse({
       getErrorMessage: error => {

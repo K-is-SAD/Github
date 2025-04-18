@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-
+// Type definition for the MongoDB model
 export interface IVectorEmbedding extends Document {
   objectId: mongoose.Types.ObjectId;
   objectType: 'repository' | 'readme' | 'section';
