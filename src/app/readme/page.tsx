@@ -1,32 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useRef, useEffect, useState } from "react";
 import { Send, Trash, Link } from "lucide-react";
 import Grid from "@/components/grids/Index";
-import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
 
 const ReadmePage = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
   const [showRepoInput, setShowRepoInput] = useState<boolean>(false);
-
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit: originalHandleSubmit,
-    status,
-    stop,
-    isLoading,
-    error,
-    reload,
-  } = useChat({
-    api: `/api/readme-content/${encodeURIComponent(repoUrl)}`,
-    body: {
-      repoUrl: repoUrl,
-    },
-  });
+  
+  // New state variables to replace useChat
+  const [messages, setMessages] = useState<Array<{id: string, role: string, content: string}>>([]);
+  const [input, setInput] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
+  const [status, setStatus] = useState<"ready" | "streaming" | "submitted">("ready");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,9 +27,73 @@ const ReadmePage = () => {
     window.location.reload();
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
+
+  const stop = () => {
+    setIsLoading(false);
+    setStatus("ready");
+  };
+
+  const reload = async () => {
+    setError(null);
+    await handleSubmit({
+      preventDefault: () => {},
+    } as React.FormEvent<HTMLFormElement>);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    originalHandleSubmit(e);
+    
+    if (!input.trim()) return;
+    
+    // Add user message to chat
+    const userMessage = {
+      id: Date.now().toString(),
+      role: "user",
+      content: input
+    };
+    setMessages(prev => [...prev, userMessage]);
+    
+    // Clear input and set loading state
+    setInput("");
+    setIsLoading(true);
+    setStatus("submitted");
+    
+    try {
+      // Call the API endpoint
+      const response = await fetch(`/api/readme-content/${encodeURIComponent(repoUrl)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          repoUrl,
+          message: input,
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Add assistant message to chat
+      const assistantMessage = {
+        id: (Date.now() + 1).toString(),
+        role: "assistant",
+        content: data.content || data.message
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('An unknown error occurred'));
+    } finally {
+      setIsLoading(false);
+      setStatus("ready");
+    }
   };
 
   return (
@@ -147,29 +200,7 @@ const ReadmePage = () => {
         <div className="bg-transparent p-4">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit} className="relative">
-              {error && (
-                <>
-                  <div>An error occurred.</div>
-                  <button type="button" onClick={() => reload()}>
-                    Retry
-                  </button>
-                </>
-              )}
-
-              {(status === "submitted" || status === "streaming") && (
-                <div>
-                  {status === "submitted" && (
-                    <div className="flex space-x-2">
-                      <span className="animate-bounce">•</span>
-                      <span className="animate-bounce delay-75">•</span>
-                      <span className="animate-bounce delay-150">•</span>
-                    </div>
-                  )}
-                  <button type="button" onClick={() => stop()}>
-                    Stop
-                  </button>
-                </div>
-              )}
+              {(status === "submitted" || status === "streaming")}
 
               <textarea
                 value={input}
