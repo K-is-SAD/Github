@@ -1,5 +1,7 @@
 import Groq from "groq-sdk";
 
+import { getCategorySystemPrompt, getCategoryUserPrompt } from "@/prompts/getCategory_prompt";
+
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function getCategory(text : string) {
@@ -7,11 +9,11 @@ export async function getCategory(text : string) {
     messages: [
       {
         role : "system",
-        content : "You are an efficient LLM. You will be provided with a text or a question and you need to extract the category from the prompt. Like if user asks for a readme post, then category wil be 'Readme'. If user asks for a linkedIn post, then category will be 'LinkedIn'. If user asks for a blog post, then category will be 'Blog'. If user asks for a tweet, then category will be 'Tweet'. If user asks for an article, then category will be 'Article', etc",
+        content : getCategorySystemPrompt,
       },
       {
         role: "user",
-        content: `Extract the category from the text/question: ${text}. You need to give a single word as a category. You are not allowed to use any other format. Just return a string. Examples : 'Blog', `,
+        content: getCategoryUserPrompt.replace("{{text}}", text),
       },
     ],
     model: "llama-3.3-70b-versatile",
