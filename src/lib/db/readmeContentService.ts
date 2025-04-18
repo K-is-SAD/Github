@@ -1,5 +1,5 @@
+import ReadmeContent from '@/models/ReadmeContent';
 import dbconnect from '../connectDatabase';
-import { ReadmeContent } from '@/models';
 
 //Creates or updates readme content for a repository
 

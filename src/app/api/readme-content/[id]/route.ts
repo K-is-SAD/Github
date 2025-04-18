@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readmeContentService } from '@/lib/db';
 import dbconnect from '@/lib/connectDatabase';
 import { auth } from '@clerk/nextjs/server';
-import { User } from '@/models';
 import RepoSummaryModel from '@/models/reposummary';
 import { generatePosts } from '@/utils/generateReadme';
 import { getCategory } from '@/utils/getCategory';
+import User from '@/models/User';
+import { deleteReadmeContent, saveReadmeContent } from '@/lib/db/readmeContentService';
 
 interface RouteParams {
   params : {
@@ -18,8 +18,8 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
   try {
     const { id } = await params; //id -> repoUrl
-    const { repoUrl, messages } = await request.json();
-    const prompt = messages[messages.length - 1].content;
+    const { repoUrl, message } = await request.json();
+    const prompt = message;
     console.log("Received prompt for generating readme : ", prompt);
     console.log("Received repoUrl : ", repoUrl);
 
@@ -47,12 +47,14 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
     const fullContext = JSON.stringify(existingRepoSummary);
 
-    const content = await generatePosts(fullContext, prompt);
     const category = await getCategory(prompt);
+    const content = await generatePosts(fullContext, prompt);
 
-    const result = await readmeContentService.saveReadmeContent(repoUrl,userId, content, category, false); 
+    console.log("Category of generation : ", category);
 
-    return NextResponse.json(result, { status: 200 });
+    const result = await saveReadmeContent(repoUrl, userId, content, category, false); 
+
+    return NextResponse.json({content : content}, { status: 200 });
 
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -81,7 +83,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         throw new Error('User not found in database');
     }
 
-    const result = await readmeContentService.deleteReadmeContent(repoUrl, userId, content);
+    const result = await deleteReadmeContent(repoUrl, userId, content);
     return NextResponse.json(result, { status: 200 });
   } catch (error: unknown) {
     if (error instanceof Error) {
