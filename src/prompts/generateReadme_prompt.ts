@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 
 // Read the template file
-const templatePath = path.join(__dirname, '../utils/template.md');   
-const template = fs.readFileSync(templatePath, 'utf-8');
+// const templatePath = path.join(__dirname, '../utils/template.md');   
+// const template = fs.readFileSync(templatePath, 'utf-8');
 
 // export const generateReadmeSystemPrompt = `You are a professional documentation specialist with expertise in creating high-quality GitHub repository documentation. Your task is to generate comprehensive, well-structured README files or engaging social media content for code repositories.
 
