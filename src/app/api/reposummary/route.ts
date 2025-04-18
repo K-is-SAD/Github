@@ -1,5 +1,5 @@
 import dbconnect from "@/lib/connectDatabase";
-import { User } from "@/models";
+import User from "@/models/User";
 import RepoSummaryModel from "@/models/reposummary";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";

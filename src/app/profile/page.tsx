@@ -180,18 +180,11 @@ export default function ProfilePage() {
             <div className="relative h-32 bg-gradient-to-r from-blue-950 to-black">
               <div className="absolute -bottom-12 left-8">
                 {user?.imageUrl ? (
-<<<<<<< HEAD
                   <Image
                     src={user.imageUrl}
                     alt={user.fullName || "User"}
                     width={100}
                     height={100}
-=======
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={user.imageUrl}
-                    alt={user.fullName || "User"}
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                     className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 object-cover"
                   />
                 ) : (
@@ -207,26 +200,8 @@ export default function ProfilePage() {
                     {user?.fullName || user?.username || "User"}
                   </h1>
                   <p className="text-gray-600 dark:text-gray-400">
-<<<<<<< HEAD
                     {user?.primaryEmailAddress?.emailAddress}
                   </p>
-=======
-                    @{user?.username}
-                    <br/>
-                    {user?.emailAddresses[0]?.emailAddress}
-                  </p>
-                  {user?.publicMetadata &&
-                    "githubUsername" in
-                      (user.publicMetadata as Record<string, unknown>) && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        GitHub: @
-                        {
-                          (user.publicMetadata as Record<string, unknown>)
-                            .githubUsername as string
-                        }
-                      </p>
-                    )}
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                 </div>
                 <button className="rounded-md dark:bg-white bg-black">
                   <span
@@ -270,11 +245,7 @@ export default function ProfilePage() {
                     <h2 className="text-lg font-medium mb-4">
                       Usage Statistics
                     </h2>
-<<<<<<< HEAD
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-=======
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                       <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-sm text-blue-700 dark:text-blue-300">
@@ -360,7 +331,6 @@ export default function ProfilePage() {
 
                   <div>
                     <h2 className="text-lg font-medium mb-4">Quick Actions</h2>
-<<<<<<< HEAD
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       {actionLinks.map((link, index) => {
                         const Icon = link.icon;
@@ -375,236 +345,17 @@ export default function ProfilePage() {
                           </Link>
                         );
                       })}
-=======
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      <Link href="/codebase">
-                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
-                          <IconBrandGithub size={24} className="mb-2" />
-                          <span className="text-sm font-medium">
-                            Add Repository
-                          </span>
-                        </div>
-                      </Link>
-                      <Link href="/templates">
-                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
-                          <IconTemplate size={24} className="mb-2" />
-                          <span className="text-sm font-medium">
-                            Browse Templates
-                          </span>
-                        </div>
-                      </Link>
-                      <Link href="/editor">
-                        <div className="flex flex-col items-center p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer">
-                          <IconHistory size={24} className="mb-2" />
-                          <span className="text-sm font-medium">
-                            New Article
-                          </span>
-                        </div>
-                      </Link>
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                     </div>
                   </div>
                 </div>
               )}
 
-<<<<<<< HEAD
-=======
-              {/* Settings Tab */}
-              {activeTab === "settings" && (
-                <div>
-                  {loading ? (
-                    <div className="flex justify-center p-8">
-                      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">
-                          Preferences
-                        </h3>
-                        <div className="space-y-4 bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <label className="text-sm font-medium">
-                                Use AI for content generation
-                              </label>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Enable AI-powered features to enhance content
-                                creation
-                              </p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={preferences.useAI}
-                                onChange={(e) =>
-                                  handlePreferenceChange(
-                                    "useAI",
-                                    e.target.checked as boolean
-                                  )
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                            </label>
-                          </div>
-
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <label className="text-sm font-medium">
-                                Dark Mode
-                              </label>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Enable dark mode for a better viewing experience
-                                in low light
-                              </p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                              <input
-                                type="checkbox"
-                                checked={preferences.darkMode}
-                                onChange={(e) =>
-                                  handlePreferenceChange(
-                                    "darkMode",
-                                    e.target.checked as boolean
-                                  )
-                                }
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                            </label>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium mb-1">
-                              Default Template
-                            </label>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                              Choose a template that will be used as default
-                              when creating new content
-                            </p>
-                            <select
-                              value={preferences.defaultTemplate}
-                              onChange={(e) =>
-                                handlePreferenceChange(
-                                  "defaultTemplate",
-                                  e.target.value as string
-                                )
-                              }
-                              className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-                            >
-                              <option value="">
-                                Select a default template
-                              </option>
-                              {templates.map((template) => (
-                                <option key={template._id} value={template._id}>
-                                  {template.name}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div className="pt-4 flex items-center">
-                            <Button
-                              onClick={handleSave}
-                              className="rounded-md dark:bg-white bg-black"
-                            >
-                              <span className="block -translate-x-1 -translate-y-1 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 hover:-translate-y-2 active:translate-x-0 active:translate-y-0 transition-all">
-                                Save Preferences
-                              </span>
-                            </Button>
-
-                            {saveSuccess !== null && (
-                              <div
-                                className={`ml-4 flex items-center ${
-                                  saveSuccess
-                                    ? "text-green-600"
-                                    : "text-red-600"
-                                }`}
-                              >
-                                {saveSuccess ? (
-                                  <>
-                                    <IconCheck size={16} className="mr-1" />
-                                    <span className="text-sm">
-                                      Settings saved!
-                                    </span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <IconX size={16} className="mr-1" />
-                                    <span className="text-sm">
-                                      Failed to save
-                                    </span>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">Account</h3>
-                        <div className="space-y-4 bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg">
-                          <div>
-                            <label className="block text-sm font-medium mb-1">
-                              Email
-                            </label>
-                            <div className="flex items-center">
-                              <input
-                                type="email"
-                                value={
-                                  user?.primaryEmailAddress?.emailAddress || ""
-                                }
-                                readOnly
-                                className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500"
-                              />
-                              <Button className="ml-2 rounded-md bg-transparent border border-gray-300 dark:border-gray-600">
-                                Change
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium mb-1">
-                              Password
-                            </label>
-                            <div className="flex items-center">
-                              <input
-                                type="password"
-                                value="••••••••••••"
-                                readOnly
-                                className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 text-gray-500"
-                              />
-                              <Button className="ml-2 rounded-md bg-transparent border border-gray-300 dark:border-gray-600">
-                                Change
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="pt-4">
-                            <button className="text-red-600 dark:text-red-400 text-sm hover:underline">
-                              Delete account
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
               {/* Activity Tab */}
               {activeTab === "activity" && (
                 <div>
                   <h2 className="text-lg font-medium mb-4">Activity History</h2>
 
-<<<<<<< HEAD
                   <div className="bg-transparent rounded-lg">
-=======
-                  <div className="bg-transparent border-2 dark:border-white border-black rounded-lg">
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                     {activity.map((item) => (
                       <div
                         key={item._id}
@@ -640,11 +391,7 @@ export default function ProfilePage() {
                     Connected Services
                   </h2>
 
-<<<<<<< HEAD
                   <div className="bg-gray-50 dark:bg-gray-900 p-6 rounded-lg mb-6">
-=======
-                  <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-lg mb-6">
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-4">
                         <IconBrandGithub size={32} className="mt-1" />
@@ -663,30 +410,14 @@ export default function ProfilePage() {
                       </div>
 
                       <button
-<<<<<<< HEAD
                        className="dark:bg-white bg-black dark:text-black text-white py-2 px-4 rounded-md font-semibold dark:hover:bg-black dark:hover:text-white hover:bg-white hover:text-black"
-=======
-                        className={`rounded-md ${
-                          githubToken
-                            ? "dark:bg-black bg-white border-2 dark:border-white border-black px-2 py-2"
-                            : "dark:bg-white bg-black"
-                        }`}
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                         onClick={handleConnectGitHub}
                         disabled={isConnecting}
                       >
                         {githubToken ? (
                           "Disconnect"
                         ) : (
-<<<<<<< HEAD
                           <span>
-=======
-                          <span
-                            className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                            hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-                           `}
-                          >
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                             {isConnecting ? (
                               <>
                                 Connecting...
@@ -699,47 +430,6 @@ export default function ProfilePage() {
                       </button>
                     </div>
                   </div>
-<<<<<<< HEAD
-=======
-
-                  <h2 className="text-lg font-medium mb-4">API Keys</h2>
-                  <div className="bg-transparent p-6 rounded-lg">
-                    <div className="flex items-start space-x-4">
-                      <IconKey size={32} className="mt-1" />
-                      <div className="flex-1 space-y-8">
-                        <h3 className="font-medium">API Access</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          Generate an API key to access our services
-                          programmatically
-                        </p>
-
-                        <div className="mt-4 flex items-center ">
-                          <input
-                            type="text"
-                            value="••••••••••••••••••••••••••••••"
-                            readOnly
-                            className="w-full p-2 rounded-l-md  bg-transparent border-1 dark:border-white border-black text-gray-500"
-                          />
-                          <button className="p-2 rounded-r-md bg-gray-200 dark:bg-gray-700 border-1 dark:border-white border-white border-l-0  hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-                            Copy
-                          </button>
-                        </div>
-
-                        <div className="mt-4">
-                          <button className="rounded-md dark:bg-white bg-black">
-                            <span
-                              className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
-                            >
-                              Generate New Key
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
->>>>>>> 183be3f94c2f8eaed888355a21f786096f8385d1
                 </div>
               )}
             </div>
