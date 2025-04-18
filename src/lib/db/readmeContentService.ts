@@ -1,251 +1,208 @@
 import dbconnect from '../connectDatabase';
-import { ReadmeContent, Repository, User } from '@/models';
-import mongoose from 'mongoose';
-import { getAuth } from '@clerk/nextjs/server';
-import { NextApiRequest } from 'next';
+import { ReadmeContent } from '@/models';
 
 //Creates or updates readme content for a repository
 
 export async function saveReadmeContent(
-  req: Request,
-  repositoryId: string,
-  contentData: {
-    content: string;
-    rawContent?: string;
-    templateUsed?: string;
-    sections: {
-      title: string;
-      content: string;
-      order: number;
-    }[];
-    isPublished?: boolean;
-    aiAssisted?: boolean;
-  }
+  repoUrl : string,
+  userId : string,
+  content : string,
+  category : string,
+  edited : boolean,
 ) {
   await dbconnect();
   
-  // Get current user
-  const { userId } = getAuth(req as unknown as NextApiRequest);
-  if (!userId) {
-    throw new Error('Not authenticated');
-  }
-  
-  // Find the user document
-  const user = await User.findOne({ clerkId: userId });
-  if (!user) {
-    throw new Error('User not found in database');
-  }
-  
-  // Verify repository exists and belongs to user
-  if (!mongoose.Types.ObjectId.isValid(repositoryId)) {
-    throw new Error('Invalid repository ID');
-  }
-  
-  const repository = await Repository.findOne({
-    _id: repositoryId,
-    userId: user._id
-  });
-  
-  if (!repository) {
-    throw new Error('Repository not found or access denied');
-  }
-  
-  // Check if readme content already exists for this repository
-  const existingContent = await ReadmeContent.findOne({
-    repositoryId: repository._id,
-    userId: user._id,
-    isPublished: true
-  }).sort({ version: -1 });
-  
-  // Calculate word count for metadata
-  const wordCount = contentData.content.trim().split(/\s+/).length;
-  
-  if (existingContent) {
-    // Create new version of readme content
-    const newVersion = new ReadmeContent({
-      repositoryId: repository._id,
-      userId: user._id,
-      content: contentData.content,
-      rawContent: contentData.rawContent,
-      version: existingContent.version + 1,
-      isPublished: contentData.isPublished ?? true,
-      templateUsed: contentData.templateUsed,
-      sections: contentData.sections,
-      metadata: {
-        generatedAt: new Date(),
-        aiAssisted: contentData.aiAssisted ?? false,
-        wordCount
+  try {
+    const existingcontent = await ReadmeContent.findOne({
+    repoUrl,
+    userId: userId,
+    })
+
+    if(existingcontent){
+      existingcontent.posts.push({
+        content : content,
+        category : category,
+        edited : edited,
+        createdAt : new Date(Date.now())
+      })
+
+      await existingcontent.save();
+
+      return {
+        success: true,
+        message : "Readme content updated successfully",
+        data : existingcontent
       }
-    });
-    
-    return newVersion.save();
-  }
-  
-  // Create first version of readme content
-  const newContent = new ReadmeContent({
-    repositoryId: repository._id,
-    userId: user._id,
-    content: contentData.content,
-    rawContent: contentData.rawContent,
-    version: 1,
-    isPublished: contentData.isPublished ?? true,
-    templateUsed: contentData.templateUsed,
-    sections: contentData.sections,
-    metadata: {
-      generatedAt: new Date(),
-      aiAssisted: contentData.aiAssisted ?? false,
-      wordCount
     }
-  });
-  
-  return newContent.save();
+
+    const newcontent = new ReadmeContent({
+      repoUrl : repoUrl,
+      userId : userId,
+      posts : [{
+        content : content,
+        category : category,
+        edited : edited,
+        createdAt : new Date(Date.now())
+      }]
+    })
+
+    await newcontent.save();
+
+    return {
+      success : true,
+      message : "Readme content created successfully",
+      data : newcontent
+    }
+  } catch (error:any) {
+    return {
+      success : false,
+      message : error.message
+    }
+  }
+
 }
 
 /**
- * Gets the latest readme content for a repository
+ * Gets all readme contents for a repository
  */
-export async function getLatestReadmeContent(req: Request, repositoryId: string) {
+export async function getReadmeContentHistory(repoUrl: string, userId : string) {
   await dbconnect();
-  
-  // Get current user
-  const { userId } = getAuth(req as unknown as NextApiRequest);
-  if (!userId) {
-    throw new Error('Not authenticated');
+
+  try {
+
+    const content = await ReadmeContent.aggregate([
+      {
+        $match : {
+          userId : userId,
+          repoUrl : repoUrl
+        }
+      },
+      {
+        $unwind : '$posts'
+      },
+      {
+        $group : {
+          _id : '$posts.category', 
+          posts : {
+            $push : '$posts'
+          }
+        }
+      },
+      {
+        $sort : {
+          'posts.createdAt' : -1
+        }
+      },
+      {
+        $group : {
+          _id : '$repoUrl', 
+          posts : {
+            $push : '$posts'
+          }
+        }
+      }
+    ])
+
+    if(content.length === 0){
+      return {
+      success : false,
+      message : "No history to display!"
+      }
+    }
+
+    return {
+      success: true,
+      message : "Histories fetched successsfully",
+      data : content[0].posts
+    }
+    
+  } catch (error:any) {
+    return {
+      success : false,
+      message : error.message
+    }
   }
-  
-  // Find the user document
-  const user = await User.findOne({ clerkId: userId });
-  if (!user) {
-    throw new Error('User not found in database');
-  }
-  
-  // Verify repository exists and belongs to user
-  if (!mongoose.Types.ObjectId.isValid(repositoryId)) {
-    throw new Error('Invalid repository ID');
-  }
-  
-  const repository = await Repository.findOne({
-    _id: repositoryId,
-    userId: user._id
-  });
-  
-  if (!repository) {
-    throw new Error('Repository not found or access denied');
-  }
-  
-  // Get latest readme content
-  return ReadmeContent.findOne({
-    repositoryId: repository._id,
-    userId: user._id
-  }).sort({ version: -1 });
 }
 
 /**
- * Gets all readme content versions for a repository
+ * Gets the latest content versions for a repository
  */
-export async function getReadmeContentHistory(req: Request, repositoryId: string) {
+export async function getLatestReadmeContent(repoUrl : string, userId : string) {
   await dbconnect();
-  
-  // Get current user
-  const { userId } = getAuth(req as unknown as NextApiRequest);
-  if (!userId) {
-    throw new Error('Not authenticated');
-  }
-  
-  // Find the user document
-  const user = await User.findOne({ clerkId: userId });
-  if (!user) {
-    throw new Error('User not found in database');
-  }
-  
-  // Verify repository exists and belongs to user
-  if (!mongoose.Types.ObjectId.isValid(repositoryId)) {
-    throw new Error('Invalid repository ID');
-  }
-  
-  const repository = await Repository.findOne({
-    _id: repositoryId,
-    userId: user._id
-  });
-  
-  if (!repository) {
-    throw new Error('Repository not found or access denied');
-  }
-  
-  // Get all readme content versions
-  return ReadmeContent.find({
-    repositoryId: repository._id,
-    userId: user._id
-  }).sort({ version: -1 });
-}
 
-/**
- * Gets a specific readme content version
- */
-export async function getReadmeContentVersion(req: Request, readmeContentId: string) {
-  await dbconnect();
-  
-  // Get current user
-  const { userId } = getAuth(req as unknown as NextApiRequest);
-  if (!userId) {
-    throw new Error('Not authenticated');
+  try {
+
+    const latestcontent = await ReadmeContent.findOne({
+      repoUrl : repoUrl,
+      userId: userId
+    }).sort({ 'posts.createdAt': -1 }).select('-userId -repoUrl');
+
+    if(!latestcontent){
+      return {
+        success : false,
+        message : "No history to display!"
+      }
+    }
+
+    return {
+      success: true,
+      message : "Histories fetched successsfully",
+      data : latestcontent.posts[0].content
+    }
+
+  } catch (error:any) {
+    return {
+      success : false,
+      message : error.message
+    }
   }
-  
-  // Find the user document
-  const user = await User.findOne({ clerkId: userId });
-  if (!user) {
-    throw new Error('User not found in database');
-  }
-  
-  // Verify readme content exists and belongs to user
-  if (!mongoose.Types.ObjectId.isValid(readmeContentId)) {
-    throw new Error('Invalid readme content ID');
-  }
-  
-  const readmeContent = await ReadmeContent.findOne({
-    _id: readmeContentId,
-    userId: user._id
-  });
-  
-  if (!readmeContent) {
-    throw new Error('Readme content not found or access denied');
-  }
-  
-  return readmeContent;
 }
 
 /**
  * Deletes a specific readme content version
  */
-export async function deleteReadmeContent(req: Request, readmeContentId: string) {
+export async function deleteReadmeContent(repoUrl: string, userId : string, content : string) {
   await dbconnect();
   
-  // Get current user
-  const { userId } = getAuth(req as unknown as NextApiRequest);
-  if (!userId) {
-    throw new Error('Not authenticated');
+  try {
+    const existingcontent = await ReadmeContent.findOne({
+      repoUrl : repoUrl,
+      userId : userId,
+      posts : {
+        content : content
+      }
+    })
+
+    if(!existingcontent){
+      return {
+        success : false,
+        message : "No history to delete!"
+      }
+    }
+
+    const updatedcontent = await ReadmeContent.updateOne(
+      { repoUrl : repoUrl, userId : userId },
+      { $pull: { posts: { content : content } } },
+      { new: true }
+    )
+
+    if(!updatedcontent){
+      return {
+        success : false,
+        message : "Deletion failed!"
+      }
+    }
+
+    return {
+      success: true,
+      message : "Histories fetched successsfully",
+      data : updatedcontent
+    }
+
+  } catch (error:any) {
+    return {
+      success : false,
+      message : error.message
+    }
   }
-  
-  // Find the user document
-  const user = await User.findOne({ clerkId: userId });
-  if (!user) {
-    throw new Error('User not found in database');
-  }
-  
-  // Verify readme content exists and belongs to user
-  if (!mongoose.Types.ObjectId.isValid(readmeContentId)) {
-    throw new Error('Invalid readme content ID');
-  }
-  
-  // Delete readme content with permissions check
-  const result = await ReadmeContent.deleteOne({
-    _id: readmeContentId,
-    userId: user._id
-  });
-  
-  if (result.deletedCount === 0) {
-    throw new Error('Readme content not found or access denied');
-  }
-  
-  return { success: true, message: 'Readme content deleted successfully' };
 }
