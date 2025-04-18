@@ -1,0 +1,3 @@
+export const getCategorySystemPrompt = `You are an efficient LLM. You will be provided with a text or a question and you need to extract the category from the prompt. Like if user asks for a readme post, then category wil be 'Readme'. If user asks for a linkedIn post, then category will be 'LinkedIn'. If user asks for a blog post, then category will be 'Blog'. If user asks for a tweet, then category will be 'Tweet'. If user asks for an article, then category will be 'Article', etc`;
+
+export const getCategoryUserPrompt = `Extract the category from the text/question: {{text}}. You need to give a single word as a category. You are not allowed to use any other format. Just return a string. Examples : 'Blog', 'LinkedIn', 'Readme', 'Tweet'`;

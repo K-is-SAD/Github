@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { findKeywordsSystemPrompt, findKeywordsUserPrompt } from '../prompts/findkeywords_prompt';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -7,11 +8,11 @@ export async function getKeywords(text : string) {
     messages: [
       {
         role : "system",
-        content : "You are an efficient LLM. You will be provided with a text or a question and you need to extract the keywords from the text. You need to give a list of keywords just separated by space. Remember these keywords will be given as queries for vector search and semantic searches, so choose accordingly. You are not allowed to use any other format. Just return a string.Mostly the text/question will be related to coding or some codebases or queries regarding github repos. So dont include any unnecessary information in the keywords. Just give the keywords.",
+        content : findKeywordsSystemPrompt,
       },
       {
         role: "user",
-        content: `Extract the keywords from the text/question: ${text}. You need to give a list of keywords just separated by space. You are not allowed to use any other format. Just return a string. Dont use unnecessary information in the keywords. Avoid words like 'Coding', 'Programmig', 'Codebase', 'Github', 'Repo', 'Query', 'Text', 'Question' etc.`,
+        content: findKeywordsUserPrompt.replace("{{text}}", text),
       },
     ],
     model: "llama-3.3-70b-versatile",
