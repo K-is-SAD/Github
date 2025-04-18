@@ -26,6 +26,11 @@ const ReadmeContentSchema: Schema<IReadmeContent> = new Schema({
   timestamps: true
 });
 
+ReadmeContentSchema.post('deleteMany', async(result, next)=>{
+    console.log("RepoEmbedding deleted successfully", result);
+    next();
+});
+
 const ReadmeContent = mongoose.models.ReadmeContent as mongoose.Model<IReadmeContent> || mongoose.model<IReadmeContent>('ReadmeContent', ReadmeContentSchema);
 
 export default ReadmeContent;

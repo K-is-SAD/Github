@@ -1,3 +1,4 @@
+
 import ReadmeContent from '@/models/ReadmeContent';
 import dbconnect from '../connectDatabase';
 
@@ -70,38 +71,35 @@ export async function getReadmeContentHistory(repoUrl: string, userId : string) 
 
   try {
 
-    const content = await ReadmeContent.aggregate([
-      {
-        $match : {
-          userId : userId,
-          repoUrl : repoUrl
-        }
-      },
-      {
-        $unwind : '$posts'
-      },
-      {
-        $group : {
-          _id : '$posts.category', 
-          posts : {
-            $push : '$posts'
-          }
-        }
-      },
-      {
-        $sort : {
-          'posts.createdAt' : -1
-        }
-      },
-      {
-        $group : {
-          _id : '$repoUrl', 
-          posts : {
-            $push : '$posts'
-          }
-        }
-      }
-    ])
+    const content = await ReadmeContent.aggregate(
+      [
+        {
+          $match: {
+            userId: userId,
+            repoUrl:
+              repoUrl,
+          },
+        },
+        {
+          $unwind: "$posts",
+        },
+        {
+          $sort: {
+            "posts.createdAt": -1,
+          },
+        },
+        {
+          $group: {
+            _id: "$posts.category",
+            posts: {
+              $push: "$posts",
+            },
+          },
+        },
+      ]
+    )
+
+    console.log("All contents : ", content);
 
     if(content.length === 0){
       return {
@@ -113,7 +111,7 @@ export async function getReadmeContentHistory(repoUrl: string, userId : string) 
     return {
       success: true,
       message : "Histories fetched successsfully",
-      data : content[0].posts
+      data : content
     }
     
   } catch (error:any) {
@@ -169,11 +167,14 @@ export async function deleteReadmeContent(repoUrl: string, userId : string, cont
       repoUrl : repoUrl,
       userId : userId,
       posts : {
-        content : content
+        $elemMatch: { 
+          "content": content 
+        }
       }
     })
 
     if(!existingcontent){
+      console.log("No content found to delete!")
       return {
         success : false,
         message : "No history to delete!"
@@ -193,13 +194,65 @@ export async function deleteReadmeContent(repoUrl: string, userId : string, cont
       }
     }
 
+    console.log("Updated content : ", updatedcontent);
+
     return {
       success: true,
-      message : "Histories fetched successsfully",
+      message : "Content deleted successfully",
       data : updatedcontent
     }
 
   } catch (error:any) {
+    console.log("Error in deleting a particular content : ", error.message)
+    return {
+      success : false,
+      message : error.message
+    }
+  }
+}
+
+/**
+ * Deletes all readme content for a repository
+ */
+export async function deleteAllReadmeContent(repoUrl: string, userId : string) {
+  await dbconnect();
+  
+  try {
+    const existingcontent = await ReadmeContent.findOne({
+      repoUrl : repoUrl,
+      userId : userId,
+    })
+
+    if(!existingcontent){
+      console.log("No content found to delete!")
+      return {
+        success : false,
+        message : "No history to delete!"
+      }
+    }
+
+    const deletedcontent = await ReadmeContent.findOneAndDelete({
+      repoUrl : repoUrl,
+      userId : userId
+    })
+
+    if(!deletedcontent){
+      return {
+        success : false,
+        message : "Deletion failed!"
+      }
+    }
+
+    console.log("Deleted content : ", deletedcontent);
+
+    return {
+      success: true,
+      message : "Content deleted successfully",
+      data : deletedcontent
+    }
+
+  } catch (error:any) {
+    console.log("Error in deleting all content : ", error.message)
     return {
       success : false,
       message : error.message

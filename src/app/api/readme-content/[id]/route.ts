@@ -5,7 +5,7 @@ import RepoSummaryModel from '@/models/reposummary';
 import { generateReadme } from '@/utils/generateReadme';
 import { getCategory } from '@/utils/getCategory';
 import User from '@/models/User';
-import { deleteReadmeContent, saveReadmeContent } from '@/lib/db/readmeContentService';
+import { getLatestReadmeContent, getReadmeContentHistory, saveReadmeContent } from '@/lib/db/readmeContentService';
 import { generateArticle } from '@/utils/generateArticle';
 import { generateTweet } from '@/utils/generateTweet';
 
@@ -78,12 +78,13 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
   }
 }
 
-/**
- * DELETE endpoint to remove a specific readme content version
- */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function GET(request: NextRequest, { params }: RouteParams, response : NextResponse) {
+  await dbconnect();
+
   try {
-    const { repoUrl, content } = await request.json();
+    const { id } = await params; //id -> repoUrl
+    const repoUrl = decodeURIComponent(id);
+    console.log("Received repoUrl : ", repoUrl);
 
     const {userId} : {userId : string | null | undefined} = await auth();
     
@@ -96,16 +97,45 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     if (!user) {
         throw new Error('User not found in database');
     }
+    
+    //checking if the repo summary already exists
+    const existingRepoSummary = await RepoSummaryModel.findOne({
+        userId : user.clerkId,
+        repoUrl : repoUrl
+    });
 
-    const result = await deleteReadmeContent(repoUrl, userId, content);
-    return NextResponse.json(result, { status: 200 });
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error(`Error in DELETE /api/readme-content/${params.id}:`, error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if(!existingRepoSummary) {
+        return NextResponse.json({success : false, message : "Repo summary does not exist in your search history"}, {status : 200})
     }
-    console.error(`Error in DELETE /api/readme-content/${params.id}:`, error);
-    return NextResponse.json({ error: 'An unknown error occurred' }, { status: 500 });
+    
+    const result = await getReadmeContentHistory(repoUrl, userId);
+    if(result.success === false){
+      console.log("Error in fetching readme content : ", result.message);
+      return NextResponse.json({success : false, message : result.message}, {status : 200});
+    }
+    console.log("All contents : ", result.data);
+
+    result.data?.forEach((posts : any) => {
+      console.log("Category : ", posts._id);
+      posts.posts.forEach((post : any) => {
+        console.log(post.content)
+      });
+    })
+
+    const latestcontent = await getLatestReadmeContent(repoUrl, userId);
+    if(latestcontent.success === false){
+      console.log("Error in fetching latest readme content : ", latestcontent.message);
+      return NextResponse.json({success : false, message : latestcontent.message}, {status : 200});
+    }
+    console.log("Latest content : ", latestcontent.data);
+
+    return NextResponse.json({success : true, message : "Latest contents fetched successfully", data : latestcontent.data}, {status : 200});
+
+  } catch (error: any) {
+    console.error('Error in POST /api/readme-content:', error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({ success : false, error: errorMessage }, { status: 500 });
   }
 }
+
 

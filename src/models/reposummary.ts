@@ -1,5 +1,6 @@
 import mongoose, {Schema, Document} from 'mongoose';
 import RepoEmbeddingModel from './repoEmbeddings';
+import ReadmeContent from './ReadmeContent';
 
 export interface IRepoFile{
     file_name : string,
@@ -58,6 +59,13 @@ RepoSummarySchema.post('findOneAndDelete', async(result, next)=>{
         })
         console.log("RepoEmbedding deleted successfully", deletedRepoEmbedding);
     }
+
+    //also deleting the repo contents associated with the repo summary
+    const deletedRepoContents = await ReadmeContent.findOneAndDelete({
+        repoUrl : result.repoUrl,  
+        userId : result.userId
+    })
+    console.log("RepoContents deleted successfully", deletedRepoContents);
 
     next();
 })

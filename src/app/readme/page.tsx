@@ -5,6 +5,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { Send, Trash, Link } from "lucide-react";
 import Grid from "@/components/grids/Index";
 import ReactMarkdown from "react-markdown";
+import { useUser } from "@clerk/nextjs";
 
 const ReadmePage = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
@@ -63,16 +64,43 @@ const ReadmePage = () => {
     
     try {
       // Call the API endpoint
-      const response = await fetch(`/api/readme-content/${encodeURIComponent(repoUrl)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          repoUrl,
-          message : input,
-        }),
-      });
+      // const response = await fetch(`/api/readme-content/${encodeURIComponent(repoUrl)}`, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     repoUrl,
+      //     message : input,
+      //   }),
+      // });
+
+      const response = await fetch(
+        `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const result = await response.json();
+      console.log(result);
+
+      const response2 = await fetch(
+        `/api/readme-content`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            repoUrl,
+            content : result.data
+          }),
+        }
+      );
       
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);

@@ -1,5 +1,5 @@
 import dbconnect from '@/lib/connectDatabase';
-import { deleteReadmeContent } from '@/lib/db/readmeContentService';
+import { deleteAllReadmeContent, deleteReadmeContent } from '@/lib/db/readmeContentService';
 import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,10 +11,9 @@ export async function DELETE(request: NextRequest, response : NextResponse) {
   await dbconnect();
 
   try {
-    const { repoUrl, content } = await request.json();
+    const { repoUrl } = await request.json();
     
     console.log("Received repoUrl : ", repoUrl);
-    console.log("Received content : ", content);
 
     const {userId} : {userId : string | null | undefined} = await auth();
     
@@ -28,7 +27,7 @@ export async function DELETE(request: NextRequest, response : NextResponse) {
         throw new Error('User not found in database');
     }
 
-    const result = await deleteReadmeContent(repoUrl, userId, content);
+    const result = await deleteAllReadmeContent(repoUrl, userId);
     if(!result.success) {
       return NextResponse.json({ success: false, message: result.message }, { status: 200 });
     }
