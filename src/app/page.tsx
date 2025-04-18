@@ -9,13 +9,12 @@ const Products = () => {
       <div className="absolute inset-0">
         <Index />
       </div>
-
       <div className="relative gap-y-16 z-10 flex lg:flex-row flex-col items-center justify-between md:px-10 px-4 lg:top-24 top-32">
         <div className="flex flex-col gap-y-12">
           <p className="lg:text-5xl text-4xl">
             Exploring,
             <br />
-            GitLLM
+            Nebula
           </p>
           <Link href={"/chat"} className="rounded-md dark:bg-white bg-black mx-4">
             <span
