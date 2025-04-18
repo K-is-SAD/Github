@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbconnect from '@/lib/connectDatabase';
 import { auth } from '@clerk/nextjs/server';
 import RepoSummaryModel from '@/models/reposummary';
-import { generatePosts } from '@/utils/generateReadme';
+import { generateReadme } from '@/utils/generateReadme';
 import { getCategory } from '@/utils/getCategory';
 import User from '@/models/User';
 import { deleteReadmeContent, saveReadmeContent } from '@/lib/db/readmeContentService';
+import { generateArticle } from '@/utils/generateArticle';
+import { generateTweet } from '@/utils/generateTweet';
 
 interface RouteParams {
   params : {
@@ -47,8 +49,20 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
     const fullContext = JSON.stringify(existingRepoSummary);
 
+    let content = "";
+
     const category = await getCategory(prompt);
-    const content = await generatePosts(fullContext, prompt);
+    if(category === "Readme"){
+      content = await generateReadme(fullContext, prompt);
+    }else if(category === "Article"){
+      content = await generateArticle(fullContext, prompt);
+    }else if(category === "Tweet"){
+      content = await generateTweet(fullContext, prompt);
+    }else if(category === "LinkedIn"){
+      content = await generateTweet(fullContext, prompt);
+    }else{
+      content = await generateReadme(fullContext, prompt);
+    }
 
     console.log("Category of generation : ", category);
 
