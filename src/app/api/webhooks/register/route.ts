@@ -5,7 +5,9 @@ import { WebhookEvent } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 import  User  from '@/models/User';
 
-export async function POST(req : NextRequest){
+export async function POST(
+  request: NextRequest,
+) {
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
   if(!WEBHOOK_SECRET){
       throw new Error('Missing WEBHOOK_SECRET environment variable');
@@ -20,7 +22,7 @@ export async function POST(req : NextRequest){
     return NextResponse.json({success : false, message : "No svix headers"}, {status : 200})
   }
 
-  const payload = await req.json();
+  const payload = await request.json();
   const body = JSON.stringify(payload);
   console.log(payload);
   console.log("Webhook body", body);

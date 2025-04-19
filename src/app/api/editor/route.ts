@@ -7,7 +7,10 @@ import User from '@/models/User';
 import RepoSummaryModel from '@/models/reposummary';
 import { saveReadmeContent } from '@/lib/db/readmeContentService';
 
-export async function POST(request: NextRequest, response : NextResponse) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Record<string, string | string[]> }
+) {
     await dbconnect();
     
     try {

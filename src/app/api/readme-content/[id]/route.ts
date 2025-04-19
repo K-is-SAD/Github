@@ -83,11 +83,17 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
   }
 }
 
-export async function GET(request: NextRequest, { params }: RouteParams, response : NextResponse) {
+export async function GET(
+  request: NextRequest,
+  context: { params: Record<string, string | string[]> }
+) {
   await dbconnect();
 
   try {
-    const { id } = await params; //id -> repoUrl
+    const id = context.params.id;
+    if (Array.isArray(id)) {
+      throw new Error('ID must be a single string');
+    }
     const repoUrl = decodeURIComponent(id);
     console.log("Received repoUrl : ", repoUrl);
 

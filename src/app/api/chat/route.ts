@@ -14,11 +14,14 @@ import { NextRequest, NextResponse } from 'next/server';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Record<string, string | string[]> }
+) {
   await dbconnect();
 
   try {
-    const { messages, repoUrl } = await req.json();
+    const { messages, repoUrl } = await request.json();
     console.log(messages[messages.length-1].content);
 
     const keywords = await getKeywords(messages[messages.length-1].content);

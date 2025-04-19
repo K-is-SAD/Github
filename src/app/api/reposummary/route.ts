@@ -9,9 +9,12 @@ import { initialiseVectorIndex } from "@/lib/dbutils/vector-index";
 import { getQueryResults } from "@/lib/db/vectorSearch";
 import RepoEmbeddingModel from "@/models/repoEmbeddings";
 
-export async function POST(req : NextRequest, res : NextResponse) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Record<string, string | string[]> }
+) {
     await dbconnect();
-    const body = await req.json();
+    const body = await request.json();
     
     try {
         const {userId} : {userId : string | null | undefined} = await auth();

@@ -9,7 +9,10 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * DELETE endpoint to remove a specific readme content version
  */
-export async function DELETE(request: NextRequest, response : NextResponse) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Record<string, string | string[]> }
+) {
   await dbconnect();
 
   try {
