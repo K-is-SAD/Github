@@ -4,7 +4,7 @@ const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/',
-  'https://nebula-taupe-six.vercel.app/api/webhooks/register(.*)'
+  'https://nebula-taupe-six.vercel.app/api/webhooks/register'
 ])
 
 export default clerkMiddleware(async (auth, req) => {
