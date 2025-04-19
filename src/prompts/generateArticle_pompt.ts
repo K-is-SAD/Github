@@ -6,8 +6,8 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const templatePath = path.resolve(__dirname, '../formats/articleTemplate.txt')
-//console.log(templatePath)
+const templatePath = path.resolve(__dirname, '../formats/articleTemplate.md')
+console.log(templatePath)
 const template = fs.readFileSync(templatePath, 'utf-8');
 
 export const generateArticleSystemPrompt = `You are a professional technical writer with expertise in creating insightful and educational articles about software projects. Your task is to generate comprehensive, well-structured technical articles that showcase code repositories in depth.

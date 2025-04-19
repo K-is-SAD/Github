@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import dbconnect from '@/lib/connectDatabase';
 import { getQueryResults } from '@/lib/db/vectorSearch';
 import { initialiseVectorIndex } from '@/lib/dbutils/vector-index';
