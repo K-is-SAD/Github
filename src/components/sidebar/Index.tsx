@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { convertToJSON } from "@/utils/jsonConverter";
 import { useUser } from "@clerk/nextjs";
+import Link from "next/link";
 
 const Index = () => {
   const links = [
@@ -79,6 +80,7 @@ const Dashboard = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [deleteSuccess, setDeleteSuccess] = useState(false);
+  const [analysisComplete, setAnalysisComplete] = useState(false);
   const { user, isLoaded, isSignedIn } = useUser();
 
   if (!isLoaded) {
@@ -95,6 +97,7 @@ const Dashboard = () => {
     setIsLoading(true);
     setResponse("Processing your request...");
     setError("");
+    setAnalysisComplete(false);
 
     try {
       const apiResponse = await fetch("http://localhost:8000/api/summarise", {
@@ -117,6 +120,7 @@ const Dashboard = () => {
         throw new Error(data.error || "Processing failed");
       } else {
         setResponse(data.repoMarkdown);
+        setAnalysisComplete(true);
 
         const body = {
           userId: user?.id,
@@ -150,6 +154,7 @@ const Dashboard = () => {
         err instanceof Error ? err.message : "An unknown error occurred"
       );
       setResponse("");
+      setAnalysisComplete(false);
     } finally {
       setIsLoading(false);
     }
@@ -183,6 +188,7 @@ const Dashboard = () => {
       if (result.success) {
         setDeleteSuccess(true);
         setResponse("");
+        setAnalysisComplete(false);
         console.log("Repository deleted successfully");
         // Optional: Clear the input field after successful deletion
         // setRepoUrl("");
@@ -227,7 +233,7 @@ const Dashboard = () => {
             className="w-full h-96 p-3 rounded-lg focus:border-none focus:outline-none"
             placeholder="Enter GitHub repo URL (only) here..."
           />
-          <div className="flex gap-4 w-full justify-center">
+          <div className="flex md:flex-row flex-col gap-4 w-full justify-center">
             <button
               className="rounded-md dark:bg-white bg-black"
               onClick={handleSubmit}
@@ -238,7 +244,7 @@ const Dashboard = () => {
                   hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
                   ${
                     isLoading || isDeleting
-                      ? "opacity-50 cursor-not-allowed"
+                      ? "cursor-not-allowed"
                       : ""
                   }
                 `}
@@ -248,22 +254,22 @@ const Dashboard = () => {
             </button>
 
             <button
-              className="rounded-md dark:bg-red-500 bg-red-500"
+              className="rounded-md dark:bg-white bg-black"
               onClick={handleDelete}
               disabled={isLoading || isDeleting}
             >
               <span
-                className={`flex items-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 border-red-500 dark:bg-black bg-white p-4 text-xl  
+                className={`flex items-center justify-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
                   hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
                   ${
                     isLoading || isDeleting
-                      ? "opacity-50 cursor-not-allowed"
+                      ? "cursor-not-allowed"
                       : ""
                   }
                   ${deleteSuccess ? "bg-green-100" : ""}
                 `}
               >
-                <IconTrash size={20} className="text-red-500" />
+                <IconTrash size={20} className="dark:text-white text-black" />
                 {isDeleting
                   ? "Deleting..."
                   : deleteSuccess
@@ -299,25 +305,42 @@ const Dashboard = () => {
               </ReactMarkdown>
             </div>
           </div>
-          <button
-            className="rounded-md dark:bg-white bg-black"
-            onClick={handleCopy}
-            disabled={!response || response === "Processing your request..."}
-          >
-            <span
-              className={`flex items-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+          <div className="flex flex-col md:flex-row gap-4 w-full justify-center">
+            <button
+              className="rounded-md dark:bg-white bg-black"
+              onClick={handleCopy}
+              disabled={!response || response === "Processing your request..."}
+            >
+              <span
+                className={`flex items-center justify-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
                 ${
                   !response || response === "Processing your request..."
-                    ? "opacity-50 cursor-not-allowed"
+                    ? "cursor-not-allowed"
                     : ""
                 }
               `}
-            >
-              {copied ? <IconCheck size={20} /> : <IconCopy size={20} />}
-              {copied ? "Copied!" : "Copy"}
-            </span>
-          </button>
+              >
+                {copied ? <IconCheck size={20} /> : <IconCopy size={20} />}
+                {copied ? "Copied!" : "Copy"}
+              </span>
+            </button>
+            
+     
+            {analysisComplete && (
+              <Link
+                href={"/chat"}
+                className="rounded-md dark:bg-white bg-black mx-4"
+              >
+                <span
+                  className="block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl text-center hover:-translate-y-3 
+                  active:translate-x-0 active:translate-y-0 transition-all"
+                >
+                  Continue..
+                </span>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

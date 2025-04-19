@@ -7,13 +7,14 @@ import {
   Copy,
   FilePlus,
   Folder,
-  Link,
+  Github,
   Send,
   Trash,
   X,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import Link from "next/link";
 
 const ReadmePage = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
@@ -371,7 +372,7 @@ const ReadmePage = () => {
         )}
 
         <div className="flex flex-col flex-1">
-          <div className="mb-4 flex flex-col space-y-3">
+          <div className="mb-4 flex md:flex-row flex-col items-center justify-between space-y-3">
             <div className="flex items-center">
               <div className="relative w-full md:w-auto" ref={dropdownRef}>
                 <button
@@ -381,7 +382,7 @@ const ReadmePage = () => {
                   }}
                   className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
                 >
-                  <Link size={16} />
+                  <Github size={16} />
                   Set Repository URL
                   <ChevronDown
                     size={16}
@@ -393,7 +394,6 @@ const ReadmePage = () => {
 
                 {showRepoDropdown && (
                   <div className="absolute mt-1 w-72 backdrop-blur-md bg-transparent border dark:border-white border-black rounded-md shadow-lg z-20">
-                   
                     <div className="border-t dark:border-white border-black"></div>
                     {isLoadingRepos ? (
                       <div className="p-3 text-center text-sm dark:text-white text-black">
@@ -421,8 +421,6 @@ const ReadmePage = () => {
               </div>
             </div>
 
-            
-
             {repoUrl && !showRepoInput && (
               <div className="flex items-center">
                 <div className="px-3 py-1 dark:bg-black bg-white backdrop-blur-md rounded-full text-sm flex items-center">
@@ -436,8 +434,20 @@ const ReadmePage = () => {
                 </div>
               </div>
             )}
+            <Link
+              href={"/editor"}
+              className="rounded-md dark:bg-white bg-black mx-4"
+            >
+              <span
+                className="block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 text-sm text-center  hover:-translate-y-3 
+                active:translate-x-0 active:translate-y-0
+                transition-all"
+              >
+                Continue...
+              </span>
+            </Link>
           </div>
-
+          
           <div className="flex-2 overflow-y-auto h-96 p-4 md:p-6 border dark:border-white border-black rounded-lg bg-transparent">
             <div>
               {messages.length === 0 ? (

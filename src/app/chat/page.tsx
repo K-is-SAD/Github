@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useRef, useEffect, useState } from "react";
-import { Send, Trash, Link, ChevronDown, X } from "lucide-react";
+import { Send, Trash,Github,ChevronDown, X } from "lucide-react";
 import Grid from "@/components/grids/Index";
 import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
+import Link from "next/link";
 
 const ChatPage = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
@@ -107,8 +108,7 @@ const ChatPage = () => {
       </div>
 
       <div className="relative top-24 z-10 flex flex-col h-[40rem] max-w-4xl mx-auto">
-        
-        <div className="mb-4 flex items-center">
+        <div className="mb-4 flex md:flex-row flex-col items-center gap-y-4 justify-between">
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => {
@@ -117,7 +117,7 @@ const ChatPage = () => {
               }}
               className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
             >
-              <Link size={16} />
+             <Github className="text-xl" />
               Set Repository URL
               <ChevronDown
                 size={16}
@@ -126,7 +126,6 @@ const ChatPage = () => {
                 }`}
               />
             </button>
-
             {showRepoDropdown && (
               <div className="absolute mt-1 w-72 backdrop-blur-md bg-transparent border dark:border-white border-black rounded-md shadow-lg z-20">
                 <div className="border-t dark:border-white border-black"></div>
@@ -157,7 +156,9 @@ const ChatPage = () => {
 
           {repoUrl && (
             <div className="ml-4 px-3 py-1 bg-transparent dark:bg-transparent rounded-full text-sm flex items-center">
-              <span className="truncate max-w-[200px] dark:text-white text-black">{repoUrl}</span>
+              <span className="truncate max-w-[200px] dark:text-white text-black">
+                {repoUrl}
+              </span>
               <button
                 className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 onClick={() => setRepoUrl("")}
@@ -166,8 +167,20 @@ const ChatPage = () => {
               </button>
             </div>
           )}
+           <Link
+              href={"/readme"}
+              className="rounded-md dark:bg-white bg-black mx-4"
+            >
+              <span
+                className="block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-2 text-sm text-center  hover:-translate-y-3 
+    active:translate-x-0 active:translate-y-0
+    transition-all"
+              >
+                Continue...
+              </span>
+            </Link>
         </div>
-
+          
         <div className="flex-1 overflow-y-auto h-96 p-4 md:p-6 border dark:border-white border-black rounded-lg">
           <div>
             {messages.length === 0 ? (
@@ -224,7 +237,6 @@ const ChatPage = () => {
         <div className="bg-transparent p-4">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit} className="relative">
-
               <textarea
                 value={input}
                 onChange={handleInputChange}

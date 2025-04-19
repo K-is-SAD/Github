@@ -89,7 +89,7 @@ const Index = () => {
       <div className="fixed top-0 z-50 w-full shadow-lg backdrop-blur-md">
         <div className="flex items-center justify-between p-4">
           <Link href={"/"}>
-            <Image src={"/logo.png"} alt="logo" width={50} height={50} />
+            <Image src={"/logo.png"} alt="logo" width={100} height={100} />
           </Link>
           
           <div className="flex items-center gap-x-4">
