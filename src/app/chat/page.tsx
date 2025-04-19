@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useRef, useEffect, useState } from "react";
-import { Send, Trash, Link } from "lucide-react";
+import { Send, Trash, Link, ChevronDown, X } from "lucide-react";
 import Grid from "@/components/grids/Index";
 import { useChat } from "@ai-sdk/react";
 import ReactMarkdown from "react-markdown";
@@ -10,6 +10,10 @@ import ReactMarkdown from "react-markdown";
 const ChatPage = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
   const [showRepoInput, setShowRepoInput] = useState<boolean>(false);
+  const [showRepoDropdown, setShowRepoDropdown] = useState<boolean>(false);
+  const [repositories, setRepositories] = useState<Array<string>>([]);
+  const [isLoadingRepos, setIsLoadingRepos] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const {
     messages,
@@ -34,6 +38,59 @@ const ChatPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setShowRepoDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
+  useEffect(() => {
+    if (showRepoDropdown) {
+      fetchRepositories();
+    }
+  }, [showRepoDropdown]);
+
+  const fetchRepositories = async () => {
+    setIsLoadingRepos(true);
+    try {
+      const response = await fetch(`/api/allrepos`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repositories: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data.data);
+
+      setRepositories(data.data || []);
+    } catch (err) {
+      console.error("Error fetching repositories:", err);
+    } finally {
+      setIsLoadingRepos(false);
+    }
+  };
+
+  const selectRepository = (url: string) => {
+    setRepoUrl(url);
+    setShowRepoDropdown(false);
+    setShowRepoInput(false);
+  };
+
   const clearChat = () => {
     window.location.reload();
   };
@@ -52,17 +109,55 @@ const ChatPage = () => {
       <div className="relative top-24 z-10 flex flex-col h-[40rem] max-w-4xl mx-auto">
         
         <div className="mb-4 flex items-center">
-          <button
-            onClick={() => setShowRepoInput(!showRepoInput)}
-            className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
-          >
-            <Link size={16} />
-            {showRepoInput ? "Hide Repo URL" : "Set Repository URL"}
-          </button>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => {
+                setShowRepoDropdown(!showRepoDropdown);
+                setShowRepoInput(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
+            >
+              <Link size={16} />
+              Set Repository URL
+              <ChevronDown
+                size={16}
+                className={`transition-transform ${
+                  showRepoDropdown ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            {showRepoDropdown && (
+              <div className="absolute mt-1 w-72 backdrop-blur-md bg-transparent border dark:border-white border-black rounded-md shadow-lg z-20">
+                <div className="border-t dark:border-white border-black"></div>
+                {isLoadingRepos ? (
+                  <div className="p-3 text-center text-sm dark:text-white text-black">
+                    Loading repositories...
+                  </div>
+                ) : repositories.length > 0 ? (
+                  <ul className="max-h-48 overflow-y-auto overflow-x-hidden text-wrap">
+                    {repositories.map((repo, index) => (
+                      <li
+                        key={index}
+                        className="px-3 py-2 cursor-pointer text-sm dark:text-white text-black hover:bg-gray-100 dark:hover:bg-gray-700"
+                        onClick={() => selectRepository(repo)}
+                      >
+                        {repo}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="p-3 text-center text-sm dark:text-white text-black">
+                    No repositories found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {repoUrl && (
-            <div className="ml-4 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm flex items-center">
-              <span className="truncate max-w-[200px]">{repoUrl}</span>
+            <div className="ml-4 px-3 py-1 bg-transparent dark:bg-transparent rounded-full text-sm flex items-center">
+              <span className="truncate max-w-[200px] dark:text-white text-black">{repoUrl}</span>
               <button
                 className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                 onClick={() => setRepoUrl("")}
@@ -72,24 +167,6 @@ const ChatPage = () => {
             </div>
           )}
         </div>
-
-        {showRepoInput && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={repoUrl}
-                onChange={(e) => setRepoUrl(e.target.value)}
-                placeholder="Enter GitHub repository URL"
-                className="w-full px-4 py-2 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent bg-transparent dark:text-white text-black"
-              />
-            </div>
-            <p className="text-xs dark:text-white text-black mt-1">
-              Adding a repository URL helps provide context for
-              repository-specific questions
-            </p>
-          </div>
-        )}
 
         <div className="flex-1 overflow-y-auto h-96 p-4 md:p-6 border dark:border-white border-black rounded-lg">
           <div>
@@ -147,29 +224,6 @@ const ChatPage = () => {
         <div className="bg-transparent p-4">
           <div className="max-w-4xl mx-auto">
             <form onSubmit={handleSubmit} className="relative">
-              {error && (
-                <>
-                  <div>An error occurred.</div>
-                  <button type="button" onClick={() => reload()}>
-                    Retry
-                  </button>
-                </>
-              )}
-
-              {(status === "submitted" || status === "streaming") && (
-                <div>
-                  {status === "submitted" && (
-                    <div className="flex space-x-2">
-                      <span className="animate-bounce">•</span>
-                      <span className="animate-bounce delay-75">•</span>
-                      <span className="animate-bounce delay-150">•</span>
-                    </div>
-                  )}
-                  <button type="button" onClick={() => stop()}>
-                    Stop
-                  </button>
-                </div>
-              )}
 
               <textarea
                 value={input}
