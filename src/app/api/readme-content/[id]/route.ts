@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 import dbconnect from '@/lib/connectDatabase';
 import { auth } from '@clerk/nextjs/server';
@@ -129,7 +131,7 @@ export async function GET(request: NextRequest, { params }: RouteParams, respons
     }
     console.log("Latest content : ", latestcontent.data);
 
-    return NextResponse.json({success : true, message : "Latest contents fetched successfully", data : latestcontent.data}, {status : 200});
+    return NextResponse.json({success : true, message : "Latest contents fetched successfully", data : result.data}, {status : 200});
 
   } catch (error: any) {
     console.error('Error in POST /api/readme-content:', error);

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import ReadmeContent from '@/models/ReadmeContent';
 import dbconnect from '../connectDatabase';

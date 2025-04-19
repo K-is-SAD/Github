@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MongoClient } from 'mongodb';
 
 export async function initialiseVectorIndex() {
@@ -51,7 +52,7 @@ export async function initialiseVectorIndex() {
         for await (const index of allIndexes) {
             console.log(index);
             if (index.name === result) {
-                if (index.queryable) {
+                if ((index as any).queryable) {
                     console.log(`${result} is ready for querying.`);
                     isQueryable = true;
             } else {

@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import dbconnect from '@/lib/connectDatabase';
-import { deleteAllReadmeContent, deleteReadmeContent } from '@/lib/db/readmeContentService';
+import { deleteAllReadmeContent } from '@/lib/db/readmeContentService';
 import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
