@@ -50,10 +50,13 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
     }
 
     const fullContext = JSON.stringify(existingRepoSummary);
+    console.log("Full context : ", fullContext);
 
     let content = "";
 
     const category = await getCategory(prompt);
+    console.log("Category of generation : ", category);
+
     if(category === "Readme"){
       content = await generateReadme(fullContext, prompt);
     }else if(category === "Article"){

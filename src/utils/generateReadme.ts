@@ -5,7 +5,6 @@ export const generateReadme = async(context : string, prompt : string)=>{
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
     const chatCompletions = await groq.chat.completions.create({
-    model: 'llama-3.3-70b-versatile',
     messages : [
         {
         role : 'system',
@@ -16,7 +15,11 @@ export const generateReadme = async(context : string, prompt : string)=>{
         content: generateReadmeUserPrompt.replace("{{context}}", context).replace("{{prompt}}", prompt),
         },
     ],
+    model: 'llama-3.3-70b-versatile',
     });
+
+    console.log("==================================================")
+    console.log("README GENERATED : ", chatCompletions?.choices[0]?.message?.content || "")
 
     return chatCompletions?.choices[0]?.message?.content || "";
 }

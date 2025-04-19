@@ -7,11 +7,10 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const templatePath = path.resolve(__dirname, '../formats/readmeTemplate.md')
-//console.log(templatePath)
-
+console.log(templatePath)
 
 const template = fs.readFileSync(templatePath, 'utf-8');
-//console.log(template);
+console.log(template);
 
 export const generateReadmeSystemPrompt = `You are a professional documentation specialist with expertise in creating high-quality GitHub repository documentation. Your task is to generate comprehensive, well-structured README files or engaging social media content for code repositories.
 
