@@ -41,9 +41,7 @@ interface TemplateData {
 }
 
 export default function EditorPage() {
-  const searchParams = useSearchParams();
-  const templateId = searchParams.get("template");
-  const repoId = searchParams.get("repo");
+ 
 
   const [content, setContent] = useState<string>("");
   const [previewMode, setPreviewMode] = useState<boolean>(false);
@@ -115,67 +113,6 @@ export default function EditorPage() {
     }
   }, [repoUrl]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (templateId) {
-        try {
-          const response = await fetch(`/api/templates/${templateId}`);
-          if (response.ok) {
-            const data = await response.json();
-            setTemplateData(data);
-            setTitle(data.repo);
-
-            // Initialize sections from template
-            if (data.sections && data.sections.length > 0) {
-              const initialSections = data.sections.map((section: Section) => ({
-                title: section.title,
-                description: section.description || "",
-                content: section.defaultContent || "",
-                order: section.order,
-              }));
-
-              initialSections.sort(
-                (a: { order: number }, b: { order: number }) =>
-                  a.order - b.order
-              );
-              setSections(initialSections);
-
-              // Generate initial content from sections
-              const initialContent = initialSections
-                .map(
-                  (section: { title: unknown; content: unknown }) =>
-                    `## ${section.title}\n\n${section.content}`
-                )
-                .join("\n\n");
-
-              setContent(`# ${data.name}\n\n${initialContent}`);
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching template:", error);
-        }
-      }
-
-      if (repoId) {
-        try {
-          const response = await fetch(`/api/repositories/${repoId}`);
-          if (response.ok) {
-            const data = await response.json();
-            setRepository(data.url);
-            setRepoUrl(data.url); // Connect to new state
-            // If we have content from this repo, load it
-            if (data.readmeContent) {
-              setContent(data.readmeContent);
-            }
-          }
-        } catch (error) {
-          console.error("Error fetching repository data:", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [templateId, repoId]);
 
   const fetchRepositories = async () => {
     setIsLoadingRepos(true);

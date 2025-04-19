@@ -86,44 +86,54 @@ export async function POST(
     }
 }
 
-export async function DELETE(req : NextRequest, res : NextResponse){
+
+export async function DELETE(request: NextRequest) {
     await dbconnect();
-    const body = await req.json();
-
+    const body = await request.json();
+  
     try {
-        const {userId} : {userId : string | null | undefined} = await auth();
-
-        if (!userId) {
+      const { userId } : { userId: string | null | undefined } = await auth();
+  
+      if (!userId) {
         throw new Error('Not authenticated');
-        }
-        console.log(userId);
-
-        const user = await User.findOne({ clerkId: userId });
-        if (!user) {
-            throw new Error('User not found in database');
-        }
-
-        //checking if the repo summary exists
-        const existingRepoSummary = await RepoSummaryModel.findOne({
-            userId : user.clerkId,
-            repoUrl : body.repoUrl
-        })
-        if(!existingRepoSummary) {
-            return NextResponse.json({success : false, message : "Repo summary does not exists"}, {status : 200})
-        }
-
-        //deleting the reposummary 
-        const deletedRepoSummary = await RepoSummaryModel.findOneAndDelete({
-            userId : user.clerkId,
-            repoUrl : body.repoUrl
-        })
-        console.log("Repo Summary deleted successfully : ", deletedRepoSummary)
-
-        return NextResponse.json({success : true, message : "Repo summary deleted successfully", deletedRepoSummary : deletedRepoSummary}, {status : 200});
-
+      }
+      console.log(userId);
+  
+      const user = await User.findOne({ clerkId: userId });
+      if (!user) {
+        throw new Error('User not found in database');
+      }
+  
+      // Check if repo summary exists
+      const existingRepoSummary = await RepoSummaryModel.findOne({
+        userId: user.clerkId,
+        repoUrl: body.repoUrl,
+      });
+  
+      if (!existingRepoSummary) {
+        return NextResponse.json(
+          { success: false, message: "Repo summary does not exist" },
+          { status: 200 }
+        );
+      }
+  
+      // Delete the repo summary
+      const deletedRepoSummary = await RepoSummaryModel.findOneAndDelete({
+        userId: user.clerkId,
+        repoUrl: body.repoUrl,
+      });
+  
+      console.log("Repo Summary deleted successfully:", deletedRepoSummary);
+  
+      return NextResponse.json(
+        { success: true, message: "Repo summary deleted successfully", deletedRepoSummary },
+        { status: 200 }
+      );
+  
     } catch (error) {
-        console.log("Error occurred in /api/reposummary deletion", error);
-        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-        return NextResponse.json({ success:false, error: errorMessage }, { status: 500 });
+      console.log("Error occurred in /api/reposummary deletion", error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+      return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
     }
-}
+  }
+  

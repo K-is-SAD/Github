@@ -4,74 +4,78 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbconnect from '@/lib/connectDatabase';
 import { auth } from '@clerk/nextjs/server';
 import RepoSummaryModel from '@/models/reposummary';
+import User from '@/models/User';
 import { generateReadme } from '@/utils/generateReadme';
 import { getCategory } from '@/utils/getCategory';
-import User from '@/models/User';
 import { getLatestReadmeContent, getReadmeContentHistory, saveReadmeContent } from '@/lib/db/readmeContentService';
 import { generateArticle } from '@/utils/generateArticle';
 import { generateTweet } from '@/utils/generateTweet';
 
 interface RouteParams {
-    id : string;
-  };
+  id: string;
+}
 
-export async function POST(request: NextRequest, { params }: RouteParams, response : NextResponse) {
+export async function POST(
+  request: NextRequest,
+  context: { params: Promise<RouteParams> }
+) {
   await dbconnect();
 
   try {
-    const { id } = await params; //id -> repoUrl
+    // Await the params Promise to get route params
+    const params = await context.params;
+    const id = params.id; // repo id from route (if needed)
+
+    // Parse JSON body
     const { repoUrl, message } = await request.json();
     const prompt = message;
-    console.log("Received prompt for generating readme : ", prompt);
-    console.log("Received repoUrl : ", repoUrl);
 
-    const {userId} : {userId : string | null | undefined} = await auth();
-    
-    if (!userId) {
-    throw new Error('Not authenticated');
-    }
-    console.log(userId);
+    // Authenticate user
+    const { userId } = await auth();
+    if (!userId) throw new Error('Not authenticated');
 
+    // Find user in DB
     const user = await User.findOne({ clerkId: userId });
-    if (!user) {
-        throw new Error('User not found in database');
-    }
-    
-    //checking if the repo summary already exists
-    const existingRepoSummary = await RepoSummaryModel.findOne({
-        userId : user.clerkId,
-        repoUrl : repoUrl
-    }).select('-userId')
+    if (!user) throw new Error('User not found in database');
 
-    if(!existingRepoSummary) {
-        return NextResponse.json({success : false, message : "Repo summary does not exist in your search history"}, {status : 200})
+    // Check if repo summary exists for user
+    const existingRepoSummary = await RepoSummaryModel.findOne({
+      userId: user.clerkId,
+      repoUrl,
+    }).select('-userId');
+
+    if (!existingRepoSummary) {
+      return NextResponse.json(
+        { success: false, message: "Repo summary does not exist in your search history" },
+        { status: 200 }
+      );
     }
 
     const fullContext = JSON.stringify(existingRepoSummary);
-    console.log("Full context : ", fullContext);
+
+    // Determine category of generation
+    const category = await getCategory(prompt);
 
     let content = "";
-
-    const category = await getCategory(prompt);
-    console.log("Category of generation : ", category);
-
-    if(category === "Readme"){
-      content = await generateReadme(fullContext, prompt);
-    }else if(category === "Article"){
-      content = await generateArticle(fullContext, prompt);
-    }else if(category === "Tweet"){
-      content = await generateTweet(fullContext, prompt);
-    }else if(category === "LinkedIn"){
-      content = await generateTweet(fullContext, prompt);
-    }else{
-      content = await generateReadme(fullContext, prompt);
+    switch (category) {
+      case "Readme":
+        content = await generateReadme(fullContext, prompt);
+        break;
+      case "Article":
+        content = await generateArticle(fullContext, prompt);
+        break;
+      case "Tweet":
+      case "LinkedIn":
+        content = await generateTweet(fullContext, prompt);
+        break;
+      default:
+        content = await generateReadme(fullContext, prompt);
     }
 
-    console.log("Category of generation : ", category);
+    // Save generated content
+    await saveReadmeContent(repoUrl, userId, content, category, false);
 
-    const result = await saveReadmeContent(repoUrl, userId, content, category, false); 
-
-    return NextResponse.json({content : content}, { status: 200 });
+    return NextResponse.json({ content }, { status: 200 });
 
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -83,68 +87,58 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
 export async function GET(
   request: NextRequest,
-  context: { params: RouteParams },
+  context: { params: Promise<RouteParams> }
 ) {
   await dbconnect();
 
   try {
-    const id = context.params.id;
+    // Await the params Promise to get route params
+    const params = await context.params;
+    const id = params.id;
     if (Array.isArray(id)) {
       throw new Error('ID must be a single string');
     }
     const repoUrl = decodeURIComponent(id);
-    console.log("Received repoUrl : ", repoUrl);
 
-    const {userId} : {userId : string | null | undefined} = await auth();
-    
-    if (!userId) {
-    throw new Error('Not authenticated');
-    }
-    console.log(userId);
+    // Authenticate user
+    const { userId } = await auth();
+    if (!userId) throw new Error('Not authenticated');
 
+    // Find user in DB
     const user = await User.findOne({ clerkId: userId });
-    if (!user) {
-        throw new Error('User not found in database');
-    }
-    
-    //checking if the repo summary already exists
+    if (!user) throw new Error('User not found in database');
+
+    // Check if repo summary exists for user
     const existingRepoSummary = await RepoSummaryModel.findOne({
-        userId : user.clerkId,
-        repoUrl : repoUrl
+      userId: user.clerkId,
+      repoUrl,
     });
 
-    if(!existingRepoSummary) {
-        return NextResponse.json({success : false, message : "Repo summary does not exist in your search history"}, {status : 200})
+    if (!existingRepoSummary) {
+      return NextResponse.json(
+        { success: false, message: "Repo summary does not exist in your search history" },
+        { status: 200 }
+      );
     }
-    
+
+    // Fetch readme content history
     const result = await getReadmeContentHistory(repoUrl, userId);
-    if(result.success === false){
-      console.log("Error in fetching readme content : ", result.message);
-      return NextResponse.json({success : false, message : result.message}, {status : 200});
+    if (!result.success) {
+      return NextResponse.json({ success: false, message: result.message }, { status: 200 });
     }
-    console.log("All contents : ", result.data);
 
-    result.data?.forEach((posts : any) => {
-      console.log("Category : ", posts._id);
-      posts.posts.forEach((post : any) => {
-        console.log(post.content)
-      });
-    })
-
+    // Fetch latest readme content
     const latestcontent = await getLatestReadmeContent(repoUrl, userId);
-    if(latestcontent.success === false){
-      console.log("Error in fetching latest readme content : ", latestcontent.message);
-      return NextResponse.json({success : false, message : latestcontent.message}, {status : 200});
+    if (!latestcontent.success) {
+      return NextResponse.json({ success: false, message: latestcontent.message }, { status: 200 });
     }
-    console.log("Latest content : ", latestcontent.data);
 
-    return NextResponse.json({success : true, message : "Latest contents fetched successfully", data : result.data}, {status : 200});
+    return NextResponse.json(
+      { success: true, message: "Latest contents fetched successfully", data: result.data },
+      { status: 200 }
+    );
 
   } catch (error: any) {
-    console.error('Error in POST /api/readme-content:', error);
-    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return NextResponse.json({ success : false, error: errorMessage }, { status: 500 });
+    return NextResponse.json({ success: false, error: error.message || 'Unknown error' }, { status: 500 });
   }
 }
-
-
