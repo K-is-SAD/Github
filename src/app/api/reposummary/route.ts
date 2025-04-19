@@ -11,7 +11,6 @@ import RepoEmbeddingModel from "@/models/repoEmbeddings";
 
 export async function POST(
   request: NextRequest,
-  context: { params: Record<string, string | string[]> }
 ) {
     await dbconnect();
     const body = await request.json();

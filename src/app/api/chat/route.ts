@@ -16,7 +16,6 @@ export const maxDuration = 30;
 
 export async function POST(
   request: NextRequest,
-  context: { params: Record<string, string | string[]> }
 ) {
   await dbconnect();
 

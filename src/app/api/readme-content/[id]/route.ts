@@ -12,10 +12,8 @@ import { generateArticle } from '@/utils/generateArticle';
 import { generateTweet } from '@/utils/generateTweet';
 
 interface RouteParams {
-  params : {
     id : string;
   };
-}
 
 export async function POST(request: NextRequest, { params }: RouteParams, response : NextResponse) {
   await dbconnect();
@@ -85,7 +83,7 @@ export async function POST(request: NextRequest, { params }: RouteParams, respon
 
 export async function GET(
   request: NextRequest,
-  context: { params: Record<string, string | string[]> }
+  context: { params: RouteParams },
 ) {
   await dbconnect();
 

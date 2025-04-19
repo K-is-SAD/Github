@@ -11,7 +11,6 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function DELETE(
   request: NextRequest,
-  context: { params: Record<string, string | string[]> }
 ) {
   await dbconnect();
 
