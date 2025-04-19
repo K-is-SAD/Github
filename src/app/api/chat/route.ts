@@ -11,7 +11,7 @@ import { auth } from '@clerk/nextjs/server';
 import { streamText } from 'ai';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Allow streaming responses up to 30 seconds
+// Allow streaming responses up to 30 second
 export const maxDuration = 30;
 
 export async function POST(
