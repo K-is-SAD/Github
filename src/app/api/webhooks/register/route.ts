@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Webhook} from 'svix';
 import { headers } from 'next/headers';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '@/models';
+import  User  from '@/models/User';
 
 export async function POST(req : NextRequest){
   const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;

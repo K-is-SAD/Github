@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MongoClient } from 'mongodb';
 import getEmbeddings from '../dbutils/getEmbeddings';
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
-export const generateEmbeddings = async (userId : string, repoUrl : string, text: any) => {
+export const generateEmbeddings = async (userId : string, repoUrl : string, text: string) => {
     const client = new MongoClient(process.env.MONGODB_URI as string);
    
     try {
@@ -22,7 +23,7 @@ export const generateEmbeddings = async (userId : string, repoUrl : string, text
         // generating embeddings for each chunk of text
         console.log("Generating embeddings and inserting documents.");
         let docCount = 0;
-        let embeddingDocument : any= [];
+        const embeddingDocument : any= [];
         await Promise.all(docs.map(async (doc) => {
             const embeddings = await getEmbeddings(doc);
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import dbconnect from "@/lib/connectDatabase";
 import User from "@/models/User";
 import RepoSummaryModel from "@/models/reposummary";

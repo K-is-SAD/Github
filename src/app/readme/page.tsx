@@ -1,15 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useRef, useEffect, useState } from "react";
-import { Send, Trash, Link } from "lucide-react";
+import { Send, Trash, Link, ChevronDown } from "lucide-react";
 import Grid from "@/components/grids/Index";
 import ReactMarkdown from "react-markdown";
 import { useUser } from "@clerk/nextjs";
 
 const ReadmePage = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
-  const [showRepoInput, setShowRepoInput] = useState<boolean>(false);
+  const [showRepoDropdown, setShowRepoDropdown] = useState<boolean>(false);
+  const [repositories, setRepositories] = useState<Array<{name: string, url: string}>>([]);
+  const [isLoadingRepos, setIsLoadingRepos] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   
   // New state variables to replace useChat
   const [messages, setMessages] = useState<Array<{id: string, role: string, content: string}>>([]);
@@ -24,12 +27,65 @@ const ReadmePage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Handle clicks outside the dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowRepoDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
+  // Fetch repositories when dropdown is opened
+  useEffect(() => {
+    if (showRepoDropdown) {
+      fetchRepositories();
+    }
+  }, [showRepoDropdown]);
+
+  const fetchRepositories = async () => {
+    setIsLoadingRepos(true);
+    try {
+      const response = await fetch(
+        `/api/allrepos`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repositories: ${response.status}`);
+      }
+
+      const data = await response.json();
+      // Assuming the API returns an array of repositories
+      setRepositories(data.data || []);
+    } catch (err) {
+      console.error("Error fetching repositories:", err);
+    } finally {
+      setIsLoadingRepos(false);
+    }
+  };
+
   const clearChat = () => {
     window.location.reload();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
+  };
+
+  const selectRepository = (url: string) => {
+    setRepoUrl(url);
+    setShowRepoDropdown(false);
   };
 
   const stop = () => {
@@ -64,50 +120,6 @@ const ReadmePage = () => {
     
     try {
       // Call the API endpoint
-      // const response = await fetch(
-      //   `/api/readme-content/${encodeURIComponent(repoUrl)}`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       repoUrl,
-      //       message: input,
-      //     }),
-      //   }
-      // );
-
-      //getting latest contents and last content
-      // const response = await fetch(
-      //   `/api/readme-content/${encodeURIComponent(repoUrl)}`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
-
-      // const result = await response.json();
-      // console.log(result);
-
-      //api testing for deletion of a particular content
-      // const response2 = await fetch(
-      //   `/api/readme-content`,
-      //   {
-      //     method: "DELETE",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       repoUrl,
-      //       content : result.data
-      //     }),
-      //   }
-      // );
-
-      //getting all repos
       const response = await fetch(
         `/api/allrepos`,
         {
@@ -149,13 +161,42 @@ const ReadmePage = () => {
       <div className="relative top-24 z-10 flex flex-col h-[40rem] max-w-4xl mx-auto">
         
         <div className="mb-4 flex items-center">
-          <button
-            onClick={() => setShowRepoInput(!showRepoInput)}
-            className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
-          >
-            <Link size={16} />
-            {showRepoInput ? "Hide Repo URL" : "Set Repository URL"}
-          </button>
+          <div className="relative" ref={dropdownRef}>
+            <button
+              onClick={() => setShowRepoDropdown(!showRepoDropdown)}
+              className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
+            >
+              <Link size={16} />
+              Set Repository URL
+              <ChevronDown size={16} className={`transition-transform ${showRepoDropdown ? 'rotate-180' : ''}`} />
+            </button>
+
+            {showRepoDropdown && (
+              <div className="absolute mt-1 w-64 bg-white dark:bg-gray-800 border dark:border-white border-black rounded-md shadow-lg z-20">
+                {isLoadingRepos ? (
+                  <div className="p-3 text-center text-sm dark:text-white text-black">
+                    Loading repositories...
+                  </div>
+                ) : repositories.length > 0 ? (
+                  <ul className="max-h-48 overflow-y-auto">
+                    {repositories.map((repo, index) => (
+                      <li 
+                        key={index}
+                        className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm dark:text-white text-black"
+                        onClick={() => selectRepository(repo.url)}
+                      >
+                        {repo.name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="p-3 text-center text-sm dark:text-white text-black">
+                    No repositories found
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           {repoUrl && (
             <div className="ml-4 px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-full text-sm flex items-center">
@@ -169,24 +210,6 @@ const ReadmePage = () => {
             </div>
           )}
         </div>
-
-        {showRepoInput && (
-          <div className="mb-4">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={repoUrl}
-                onChange={(e) => setRepoUrl(e.target.value)}
-                placeholder="Enter GitHub repository URL"
-                className="w-full px-4 py-2 rounded-lg border dark:border-white border-black focus:outline-none focus:ring-1 focus:border-transparent bg-transparent dark:text-white text-black"
-              />
-            </div>
-            <p className="text-xs dark:text-white text-black mt-1">
-              Adding a repository URL helps provide context for
-              repository-specific questions
-            </p>
-          </div>
-        )}
 
         <div className="flex-1 overflow-y-auto h-96 p-4 md:p-6 border dark:border-white border-black rounded-lg">
           <div>
