@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-const templatePath = path.resolve(__dirname, '../formats/articleTemplate.txt')
+const templatePath = path.resolve(__dirname, '../formats/articleTemplate.md')
 //console.log(templatePath)
 const template = fs.readFileSync(templatePath, 'utf-8');
 
