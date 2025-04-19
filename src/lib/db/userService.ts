@@ -1,6 +1,6 @@
 import { clerkClient, getAuth } from '@clerk/nextjs/server';
 import dbconnect from '../connectDatabase';
-import { User } from '@/models';
+import User from '@/models/User';
 
 //returns The user document from the database
 import { NextRequest } from 'next/server';
