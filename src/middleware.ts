@@ -1,9 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 const isPublicRoute = createRouteMatcher([
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-  '/',
+  'https://nebula-taupe-six.vercel.app/sign-in(.*)',
+  'https://nebula-taupe-six.vercel.app/sign-up(.*)',
+  'https://nebula-taupe-six.vercel.app/',
   'https://nebula-taupe-six.vercel.app/api/webhooks/register(.*)'
 ])
 
