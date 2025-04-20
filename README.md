@@ -3,8 +3,11 @@ Nebula transforms complicated repositories into elegant documentation with AI-po
 
 https://github.com/user-attachments/assets/cc7536fc-d537-4a22-a198-315105df3ff4
 
-## FULL DEMO VIDEO OF THE PROJECT
+## REMAINING DEMO VIDEO OF THE PROJECT (WEB3 IMPLEMENTATION)
 [VIEW DEMO VIDEO](https://drive.google.com/file/d/1a3ZxPlgpctzU4tKBbkjsQBbFNSNb6YI5/view)
+
+## FULL PPT VIDEO WHICH WAS NOT UPLOADED IN HACKQUEST PLATFORM
+[VIEW FULL PITCH VIDEO](https://github.com/user-attachments/assets/550784a7-0c56-4bb0-a4f4-ee1e94973ac9)
 
 **Your code tells a story. We just make sure everyone understands it.**
 
