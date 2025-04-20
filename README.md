@@ -3,6 +3,9 @@ Nebula transforms complicated repositories into elegant documentation with AI-po
 
 **Your code tells a story. We just make sure everyone understands it.**
 
+## ppt
+[View ppt](https://docs.google.com/presentation/d/113Yj6llw11j9YufFFc9Kj90Pxq5jBMTREmNhik9NhVw/edit?usp=sharing)
+
 ## All repos:
 ### Nebula
 [View Nebula](https://github.com/K-is-SAD/Github)
@@ -51,14 +54,6 @@ The application addresses the challenge developers face when needing to create a
 - **Export Functionality**: Download documentation in markdown format
 - **Repository History**: Access previously generated documentation
 - **Dark/Light Mode Support**: Comfortable viewing in any environment
-
-
-## 🎬 Demo
-
-[View live demo](https://github-promax.vercel.app)
-
-## ppt
-[View ppt](https://docs.google.com/presentation/d/113Yj6llw11j9YufFFc9Kj90Pxq5jBMTREmNhik9NhVw/edit?usp=sharing)
 
 ## 💻 Tech Stack
 
