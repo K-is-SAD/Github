@@ -1,6 +1,11 @@
 # Nebula 
 Nebula transforms complicated repositories into elegant documentation with AI-powered analysis. It automatically generates professional READMEs, technical articles, and social media content from your code, saving countless hours of manual documentation work. With just a URL, unlock comprehensive insights into any repository's architecture, features, and implementation details.
 
+https://github.com/user-attachments/assets/cc7536fc-d537-4a22-a198-315105df3ff4
+
+## FULL DEMO VIDEO OF THE PROJECT
+[VIEW DEMO VIDEO](https://drive.google.com/file/d/1a3ZxPlgpctzU4tKBbkjsQBbFNSNb6YI5/view)
+
 **Your code tells a story. We just make sure everyone understands it.**
 
 ## ppt
