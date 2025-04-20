@@ -1,9 +1,10 @@
 # Nebula 
 Nebula transforms complicated repositories into elegant documentation with AI-powered analysis. It automatically generates professional READMEs, technical articles, and social media content from your code, saving countless hours of manual documentation work. With just a URL, unlock comprehensive insights into any repository's architecture, features, and implementation details.
 
+## REMAINING DEMO VIDEO OF THE PROJECT (WEB3 IMPLEMENTATION)
 https://github.com/user-attachments/assets/cc7536fc-d537-4a22-a198-315105df3ff4
 
-## REMAINING DEMO VIDEO OF THE PROJECT (WEB3 IMPLEMENTATION)
+## FULL DEMO VIDEO
 [VIEW DEMO VIDEO](https://drive.google.com/file/d/1a3ZxPlgpctzU4tKBbkjsQBbFNSNb6YI5/view)
 
 ## FULL PPT VIDEO WHICH WAS NOT UPLOADED IN HACKQUEST PLATFORM
