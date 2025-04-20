@@ -6,6 +6,7 @@ import { auth } from '@clerk/nextjs/server';
 import User from '@/models/User';
 import RepoSummaryModel from '@/models/reposummary';
 import { saveReadmeContent } from '@/lib/db/readmeContentService';
+import { getCategory } from '@/utils/getCategory';
 
 export async function POST(
   request: NextRequest,
@@ -13,7 +14,7 @@ export async function POST(
     await dbconnect();
     
     try {
-        const { repoUrl, content, category } = await request.json();
+        const { repoUrl, content } = await request.json();
         console.log("Received repoUrl : ", repoUrl);
     
         const {userId} : {userId : string | null | undefined} = await auth();
@@ -37,6 +38,9 @@ export async function POST(
         if(!existingRepoSummary) {
             return NextResponse.json({success : false, message : "Repo summary does not exist in your search history"}, {status : 200})
         }
+
+        // Determine category of generation
+        const category = await getCategory(content);
 
         const result = await saveReadmeContent(repoUrl, userId, content, category, true); 
         if(!result.success) {

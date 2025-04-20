@@ -18,12 +18,13 @@ import {
   Copy,
   FilePlus,
   Folder,
-  Link,
   Send,
   Trash,
+  Github,
   X,
 } from "lucide-react";
 import { convertToJSON } from "@/utils/jsonConverter";
+import Link from "next/link";
 
 interface Section {
   title: string;
@@ -280,12 +281,23 @@ export default function EditorPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Save to database logic would go here
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await fetch("/api/editor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl, content }),
+      });
+
+      const data = await response.json();
+      if(data.success){
+        console.log("Saved content:", data.content);
+        setSavedStatus(true);
+      }
 
       // Show saved status
       setSavedStatus(true);
-      setTimeout(() => setSavedStatus(false), 3000);
+      setTimeout(() => setSavedStatus(false), 3000);  
     } catch (error) {
       console.error("Error saving:", error);
     } finally {
@@ -438,7 +450,7 @@ export default function EditorPage() {
                   }}
                   className="flex items-center gap-2 px-3 py-2 rounded-md border dark:border-white border-black text-sm dark:text-white text-black"
                 >
-                  <Link size={16} />
+                  <Github size={16} />
                   Set Repository URL
                   <ChevronDown
                     size={16}
@@ -596,6 +608,7 @@ export default function EditorPage() {
                   </span>
                 </button>
               </div>
+              <div className="space-x-4">
               <button
                 className="rounded-md dark:bg-white bg-black"
                 onClick={handleSave}
@@ -618,6 +631,20 @@ export default function EditorPage() {
                   )}
                 </span>
               </button>
+              <Link href=''>
+              <button
+                className="rounded-md dark:bg-white bg-black"
+              >
+                <span
+                  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+               `}
+                >
+                  Publish
+                </span>
+              </button>
+              </Link>
+              </div>
             </div>
           </div>
         </div>
