@@ -114,10 +114,10 @@ Provide a brief explanation of the key components and how they interact.
 <!-- AUTO-INSTALLATION -->
 ```bash
 # Clone the repository
-git clone https://github.com/username/{{name}}.git
+git clone https://github.com/{{username}}/{{repo}}.git
 
 # Navigate to project directory
-cd {{name}}
+cd {{repo}}
 
 # Install dependencies
 npm install
@@ -163,176 +163,174 @@ const instance = new {{name}}({
 });
 
 // Example usage
-const result = await instance.analyzeRepository('https://github.com/user/repo');
+const result = await instance.analyzeRepository('https://github.com/user/repo');/{{repo}}');
 console.log(result);
 
 // Other common operations
 instance.generateReadme();
 instance.customizeTemplate('template-name');
 ```
-
+<!-- /AUTO-USAGE -->
 Include more detailed examples with explanations for different use cases.
 <!-- /AUTO-USAGE -->
-
+<!-- AUTO-API -->
 ## 📚 API Reference
 <!-- AUTO-API -->
-### Main Endpoints
-
+### Main Endpointsositories`
+- **Description:** Fetch all repositories for authenticated user
 #### `GET /api/repositories`
 - **Description:** Fetch all repositories for authenticated user
-- **Parameters:** None
+- **Parameters:** Noneof repository objects
 - **Headers:** `Authorization: Bearer <token>`
 - **Response:** Array of repository objects
 - **Example:**
   ```json
-  [
-    {
-      "id": "1",
-      "name": "repo-name",
+  [   "id": "1",
+    { "name": "repo-name",
+      "id": "1",tps://github.com/user/repo",
+      "name": "repo-name",sitory description"
       "url": "https://github.com/user/repo",
       "description": "Repository description"
     }
   ]
-  ```
-
+  ````POST /api/analyze`
+- **Description:** Analyze a GitHub repository
 #### `POST /api/analyze`
 - **Description:** Analyze a GitHub repository
 - **Body:**
-  ```json
+  ```jsonUrl": "https://github.com/user/repo"
   {
-    "repoUrl": "https://github.com/user/repo"
-  }
-  ```
+    "repoUrl": "https://github.com/{{username}}/{{repo}}"
+  }*Response:** Analysis results
+  ```xample Response:**
 - **Response:** Analysis results
 - **Example Response:**
-  ```json
-  {
-    "id": "analysis-123",
-    "summary": "Project summary...",
+  ```json "analysis-123",
+  { "summary": "Project summary...",
+    "id": "analysis-123",, "Node.js"],
+    "summary": "Project summary...",re 2"]
     "techStack": ["React", "Node.js"],
     "features": ["Feature 1", "Feature 2"]
   }
-  ```
-
-Document other important endpoints...
+  ```ent other important endpoints...
 <!-- /AUTO-API -->
-
-## 🗃️ Database Schema
+Document other important endpoints...
+<!-- /AUTO-API -->hema
+<!-- AUTO-DATABASE -->
+## 🗃️ Database Schemastructure, showing relationships between collections/tables.
 <!-- AUTO-DATABASE -->
 Explain your database structure, showing relationships between collections/tables.
-
-```mermaid
 erDiagram
-    USERS ||--o{ REPOSITORIES : owns
+```mermaid||--o{ REPOSITORIES : owns
+erDiagramITORIES ||--o{ README_CONTENTS : has
+    USERS ||--o{ REPOSITORIES : owns : used_by
     REPOSITORIES ||--o{ README_CONTENTS : has
     TEMPLATES ||--o{ README_CONTENTS : used_by
-    
-    USERS {
         string id
+    USERS {ing email
+        string idme
         string email
         string name
-    }
-    
-    REPOSITORIES {
+    }EPOSITORIES {
         string id
-        string name
-        string url
+    REPOSITORIES {e
+        string idl
+        string nameription
+        string urlrId
         string description
         string userId
-    }
-    
-    TEMPLATES {
+    }EMPLATES {
         string id
-        string name
+    TEMPLATES {name
+        string idntent
+        string nameId
         string content
         string userId
-    }
-    
-    README_CONTENTS {
+    }EADME_CONTENTS {
         string id
+    README_CONTENTS {toryId
+        string idntent
         string repositoryId
         string content
         string templateId
     }
-```
-
+``` additional explanation about important fields or relationships.
+<!-- /AUTO-DATABASE -->
 Add additional explanation about important fields or relationships.
 <!-- /AUTO-DATABASE -->
-
-## 🔄 Project Workflow
+<!-- AUTO-WORKFLOW -->
+## 🔄 Project Workflowrkflow of your application.
 <!-- AUTO-WORKFLOW -->
 Explain the typical workflow of your application.
-
-```mermaid
 sequenceDiagram
-    actor User
+```mermaidUser
+sequenceDiagram App
+    actor Usert API
     participant App
-    participant API
+    participant APIHub
     participant DB
-    participant GitHub
-    
-    User->>App: Enter repository URL
+    participant GitHubrepository URL
     App->>API: Send analysis request
+    User->>App: Enter repository URLata
+    App->>API: Send analysis requestt
     API->>GitHub: Fetch repository data
     GitHub-->>API: Repository content
     API->>API: Process with LLM
-    API->>DB: Store analysis
+    API->>DB: Store analysislysis
     API-->>App: Return results
     App-->>User: Display analysis
-```
-
+``` a step-by-step explanation of this workflow.
+<!-- /AUTO-WORKFLOW -->
 Add a step-by-step explanation of this workflow.
 <!-- /AUTO-WORKFLOW -->
-
-## 🛣️ Roadmap
 <!-- AUTO-ROADMAP -->
-- [x] Feature 1 (Completed)
-- [x] Feature 2 (Completed)
+## 🛣️ Roadmap1 (Completed)
+<!-- AUTO-ROADMAP -->leted)
+- [x] Feature 1 (Completed)s - Expected Q2 2023)
+- [x] Feature 2 (Completed)Q3 2023)
 - [ ] Feature 3 (In Progress - Expected Q2 2023)
 - [ ] Feature 4 (Planned - Q3 2023)
-- [ ] Feature 5 (Under Consideration)
-
+- [ ] Feature 5 (Under Consideration)e project and upcoming milestones.
+<!-- /AUTO-ROADMAP -->
 Describe your long-term vision for the project and upcoming milestones.
 <!-- /AUTO-ROADMAP -->
-
-## 🤝 Contributing
+<!-- AUTO-CONTRIBUTING -->
+## 🤝 Contributingutions to {{name}}!
 <!-- AUTO-CONTRIBUTING -->
 We welcome contributions to {{name}}!
-
-1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+1. Fork the repository (`git commit -m 'Add some amazing feature'`)
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
+5. Open a Pull RequestING.md](CONTRIBUTING.md) for detailed guidelines on our code of conduct and submission process.
+<!-- /AUTO-CONTRIBUTING -->
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on our code of conduct and submission process.
 <!-- /AUTO-CONTRIBUTING -->
-
-## 👥 Authors
 <!-- AUTO-AUTHORS -->
-- **Your Name** - *Initial work* - [GitHub Profile](https://github.com/yourusername)
-- **Contributor Name** - *Role* - [GitHub Profile](https://github.com/contributorusername)
-
-See also the list of [contributors](https://github.com/username/repo/contributors) who participated in this project.
+## 👥 Authors** - *Initial work* - [GitHub Profile](https://github.com/{{username}})
+<!-- AUTO-AUTHORS -->* - *Role* - [GitHub Profile](https://github.com/contributorusername)
+- **Your Name** - *Initial work* - [GitHub Profile](https://github.com/{{username}})
+- **Contributor Name** - *Role* - [GitHub Profile](https://github.com/contributorusername) who participated in this project.
 <!-- /AUTO-AUTHORS -->
-
-## 🙏 Acknowledgments
+See also the list of [contributors](https://github.com/{{username}}/{{repo}}/contributors) who participated in this project.
+<!-- /AUTO-AUTHORS -->
+<!-- AUTO-ACKNOWLEDGMENTS -->
+## 🙏 Acknowledgmentshose code was used
 <!-- AUTO-ACKNOWLEDGMENTS -->
 - Hat tip to anyone whose code was used
-- Inspiration sources
+- Inspiration sourcess
 - Libraries and frameworks used
 - Mentors and advisors
 <!-- /AUTO-ACKNOWLEDGMENTS -->
-
-## 📄 License
 <!-- AUTO-LICENSE -->
+## 📄 Licenseis licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+<!-- AUTO-LICENSE -->>
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 <!-- /AUTO-LICENSE -->
-
-## 📞 Contact
 <!-- AUTO-CONTACT -->
+## 📞 Contactebsite:** [website.com](https://website.com)
+<!-- AUTO-CONTACT -->terhandle](https://twitter.com/twitterhandle)
 - **Project Website:** [website.com](https://website.com)
-- **Twitter:** [@twitterhandle](https://twitter.com/twitterhandle)
-- **Email:** your.email@example.com
-- **Discord:** [Join our community](https://discord.gg/invite-link)
-<!-- /AUTO-CONTACT -->
+- **Twitter:** [@twitterhandle](https://twitter.com/twitterhandle))
+- **Email:** your.email@example.com- **Discord:** [Join our community](https://discord.gg/invite-link)<!-- /AUTO-CONTACT -->
