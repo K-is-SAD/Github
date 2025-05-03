@@ -106,6 +106,7 @@ const Dashboard = () => {
       const apiResponse = await fetch(`${apiUrl}/api/summarise`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "omit",
         body: JSON.stringify({ github_repo_url: repoUrl }),
       });
 
