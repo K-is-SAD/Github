@@ -230,7 +230,10 @@ export default function EditorPage() {
 
     setGenerating(true);
     try {
-      const response = await fetch("http://localhost:8000/api/summarise", {
+
+      const apiUrl = process.env.PYTHON_BACKEND_URL;
+
+      const response = await fetch(`${apiUrl}/api/summarise`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ github_repo_url: repository }),

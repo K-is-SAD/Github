@@ -100,7 +100,10 @@ const Dashboard = () => {
     setAnalysisComplete(false);
 
     try {
-      const apiResponse = await fetch("http://localhost:8000/api/summarise", {
+
+      const apiUrl = process.env.PYTHON_BACKEND_URL;
+
+      const apiResponse = await fetch(`${apiUrl}/api/summarise`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ github_repo_url: repoUrl }),
