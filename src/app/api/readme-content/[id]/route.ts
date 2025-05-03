@@ -32,7 +32,7 @@ export async function POST(
     const repoUrl = decodeURIComponent(id);
 
     // Parse JSON body
-    const { repoUrl, message } = await request.json();
+    const { message } = await request.json();
     const prompt = message;
 
     // Authenticate user
