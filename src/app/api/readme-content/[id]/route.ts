@@ -26,6 +26,11 @@ export async function POST(
     const params = await context.params;
     const id = params.id; // repo id from route (if needed)
 
+    if (Array.isArray(id)) {
+      throw new Error('ID must be a single string');
+    }
+    const repoUrl = decodeURIComponent(id);
+
     // Parse JSON body
     const { repoUrl, message } = await request.json();
     const prompt = message;
