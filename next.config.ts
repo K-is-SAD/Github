@@ -2,9 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    allowedDevOrigins: ['http://192.168.0.120', 'https://nebula-backend-1-pxku.onrender.com/'],
+    allowedDevOrigins: ['http://192.168.0.120'],
   },
-  crossOrigin:'use-credentials',
+  crossOrigin:'anonymous',
   images: {
     domains: ['img.clerk.com']
   }
