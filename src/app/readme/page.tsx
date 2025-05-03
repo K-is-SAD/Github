@@ -249,8 +249,9 @@ const ReadmePage = () => {
     setStatus("submitted");
 
     try {
+      const decodedurl = encodeURIComponent(repoUrl);
       const response = await fetch(
-        `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+        `/api/readme-content/${decodedurl}`,
         {
           method: "POST",
           headers: {
