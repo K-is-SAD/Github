@@ -35,6 +35,8 @@ export async function POST(
     const { repoUrl, message } = await request.json();
     const prompt = message;
 
+    console.log(repoUrl);
+
     // Authenticate user
     const { userId } = await auth();
     if (!userId) throw new Error('Not authenticated');
