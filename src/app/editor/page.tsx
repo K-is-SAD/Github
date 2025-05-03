@@ -231,7 +231,7 @@ export default function EditorPage() {
     setGenerating(true);
     try {
 
-      const apiUrl = process.env.PYTHON_BACKEND_URL;
+      const apiUrl = process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL;
 
       const response = await fetch(`${apiUrl}/api/summarise`, {
         method: "POST",

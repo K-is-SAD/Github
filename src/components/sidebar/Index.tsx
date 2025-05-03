@@ -101,7 +101,7 @@ const Dashboard = () => {
 
     try {
 
-      const apiUrl = process.env.PYTHON_BACKEND_URL;
+      const apiUrl = process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL;
 
       const apiResponse = await fetch(`${apiUrl}/api/summarise`, {
         method: "POST",
