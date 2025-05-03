@@ -29,10 +29,10 @@ export async function POST(
     if (Array.isArray(id)) {
       throw new Error('ID must be a single string');
     }
-    const repoUrl = decodeURIComponent(id);
+    // const repoUrl = decodeURIComponent(id);
 
     // Parse JSON body
-    const { message } = await request.json();
+    const { repoUrl, message } = await request.json();
     const prompt = message;
 
     // Authenticate user
