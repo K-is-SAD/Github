@@ -10,7 +10,8 @@ import { getCategory } from '@/utils/getCategory';
 import { getLatestReadmeContent, getReadmeContentHistory, saveReadmeContent } from '@/lib/db/readmeContentService';
 import { generateArticle } from '@/utils/generateArticle';
 import { generateTweet } from '@/utils/generateTweet';
-
+import { generateLinkedin } from '@/utils/generateLinkedin';
+import { generatePitch } from '@/utils/generatePitch';
 interface RouteParams {
   id: string;
 }
@@ -72,9 +73,13 @@ export async function POST(
         content = await generateArticle(fullContext, prompt);
         break;
       case "Tweet":
-      case "LinkedIn":
         content = await generateTweet(fullContext, prompt);
         break;
+      case "LinkedIn":
+        content = await generateLinkedin(fullContext, prompt);
+        break;
+        case "Pitch":
+        content = await generatePitch(fullContext, prompt);
       default:
         content = await generateReadme(fullContext, prompt);
     }
