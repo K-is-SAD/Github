@@ -12,6 +12,7 @@ import { generateArticle } from '@/utils/generateArticle';
 import { generateTweet } from '@/utils/generateTweet';
 import { generateLinkedin } from '@/utils/generateLinkedin';
 import { generatePitch } from '@/utils/generatePitch';
+import { generatePPTContent } from '@/utils/generatePPTContent';
 interface RouteParams {
   id: string;
 }
@@ -80,6 +81,10 @@ export async function POST(
         break;
         case "Pitch":
         content = await generatePitch(fullContext, prompt);
+        break;
+      case "ppt":
+        content = await generatePPTContent(fullContext, prompt);
+        break;
       default:
         content = await generateReadme(fullContext, prompt);
     }
