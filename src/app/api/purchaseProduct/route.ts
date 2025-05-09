@@ -41,7 +41,7 @@ export async function POST(req: Request) {
      }
 
       });
-      const checkoutUrl = response.data.data.attributes.checkout_url;
+      const checkoutUrl = response.data.data.attributes.url;
       
       console.log("Response from lemonsqueezy", response.data);
       return new Response(JSON.stringify({checkoutUrl,}), {status:200});
