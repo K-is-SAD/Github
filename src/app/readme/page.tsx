@@ -128,12 +128,13 @@ const ReadmePage = () => {
     setIsLoadingCategories(true);
     try {
       const response = await fetch(
-        `/api/readme-content/${encodeURIComponent(repoUrl)}`,
+        `/api/categories`,
         {
-          method: "GET",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body : JSON.stringify({ repoUrl }),
         }
       );
 
@@ -249,9 +250,8 @@ const ReadmePage = () => {
     setStatus("submitted");
 
     try {
-      const decodedurl = encodeURIComponent(repoUrl);
       const response = await fetch(
-        `/api/readme-content/${decodedurl}`,
+        `/api/readme-content`,
         {
           method: "POST",
           headers: {

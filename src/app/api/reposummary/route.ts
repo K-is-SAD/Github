@@ -34,7 +34,7 @@ export async function POST(
             repoUrl : body.repoUrl
         })
         if(existingRepoSummary) {
-            return NextResponse.json({success : false, message : "Repo summary already exists"}, {status : 200})
+            return NextResponse.json({success : true, message : "Repo summary saved successfully", repoSummary : JSON.stringify(existingRepoSummary)}, {status : 200})
         }
 
         //checking if the repo summary embeddings already exists
