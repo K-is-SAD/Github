@@ -24,10 +24,10 @@ const navlinks: any[] = [
     name:"Editor",
     href: "/editor"
   },
-  {
-    name:"Profile",
-    href:"/profile"
-  },
+  // {
+  //   name:"Profile",
+  //   href:"/profile"
+  // },
   {
     name:"FAQs",
     href:"/faqs"
