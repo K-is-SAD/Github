@@ -1,45 +1,48 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import axios from 'axios'
+import React, { useState } from "react";
+import axios from "axios";
 import { basicFeatures, proFeatures } from "@/assets/data";
 import Grid from "@/components/grids/Index";
 
 export default function PaymentsPage() {
   const [loadingStates, setLoadingStates] = useState({
     basic: false,
-    advanced: false
+    advanced: false,
   });
-  const [error, setError] = useState<string | null>(null)
-  
-  const buy = async (productId: string, plan: 'basic' | 'advanced') => {
+  const [error, setError] = useState<string | null>(null);
+
+  const buy = async (productId: string, plan: "basic" | "advanced") => {
     try {
-      setLoadingStates(prev => ({...prev, [plan]: true}));
-      setError(null)
-      
-      const response = await axios.post('/api/purchaseProduct', {
-        productId: productId, 
+      setLoadingStates((prev) => ({ ...prev, [plan]: true }));
+      setError(null);
+
+      const response = await axios.post("/api/purchaseProduct", {
+        productId: productId,
         customData: {
-          userId: '123', // Replace with actual user ID
-        }});
-      const data = await response.data  
-      
+          userId: "123", // Replace with actual user ID
+        },
+      });
+      const data = await response.data;
+
       if (response.status < 200 || response.status >= 300) {
-        throw new Error(data.error || 'Failed to initiate payment')
+        throw new Error(data.error || "Failed to initiate payment");
       }
-      
+
       if (data.checkoutUrl) {
-        window.open(data.checkoutUrl, '_blank')
+        window.open(data.checkoutUrl, "_blank");
       } else {
-        throw new Error('No checkout URL returned')
+        throw new Error("No checkout URL returned");
       }
     } catch (err) {
-      console.error('Payment error:', err)
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+      console.error("Payment error:", err);
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     } finally {
-      setLoadingStates(prev => ({...prev, [plan]: false}));
+      setLoadingStates((prev) => ({ ...prev, [plan]: false }));
     }
-  }
+  };
 
   return (
     <div className="w-full relative">
@@ -53,16 +56,17 @@ export default function PaymentsPage() {
           </h1>
 
           <h4 className="md:text-xl text-sm text-center">
-            Nebula transforms complicated repositories into elegant documentation with AI-powered analysis.
+            Nebula transforms complicated repositories into elegant
+            documentation with AI-powered analysis.
           </h4>
         </div>
-        
+
         {error && (
           <div className="p-4 mb-6 bg-red-50 text-red-700 rounded-md border border-red-200 max-w-md mx-auto">
             {error}
           </div>
         )}
-        
+
         <div className="flex md:flex-row flex-col items-center justify-center gap-8 max-w-7xl mx-auto md:px-10 px-4">
           {/* Basic Plan */}
           <div className="bg-transparent md:w-1/2 w-full rounded-xl p-8 flex flex-col items-center justify-between space-y-6 border border-gray-200 dark:border-gray-800">
@@ -75,9 +79,13 @@ export default function PaymentsPage() {
               </div>
 
               <div>
-                <span className="text-2xl dark:text-gray-400 text-gray-950">$</span>
+                <span className="text-2xl dark:text-gray-400 text-gray-950">
+                  $
+                </span>
                 <span className="font-bold text-4xl">0</span>
-                <span className="dark:text-gray-400 text-gray-950 text-sm">/per month</span>
+                <span className="dark:text-gray-400 text-gray-950 text-sm">
+                  /per month
+                </span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center w-full">
@@ -114,7 +122,13 @@ export default function PaymentsPage() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span className={feature.highlighted ? "font-medium" : "text-gray-600 dark:text-gray-400"}>
+                      <span
+                        className={
+                          feature.highlighted
+                            ? "font-medium"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
                         {feature.text}
                       </span>
                     </div>
@@ -122,22 +136,17 @@ export default function PaymentsPage() {
                 </div>
               </div>
             </div>
+            {/* Basic Plan Button: NO onClick */}
             <button
-              onClick={() => buy('795918', 'basic')}
-              disabled={loadingStates.basic}
-              className="w-40 rounded-md dark:bg-white bg-black"
+              disabled
+              className="w-40 rounded-md dark:bg-white bg-black opacity-50 cursor-not-allowed"
             >
-              <span
-                className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-                  ${loadingStates.basic ? 'opacity-75 cursor-not-allowed' : ''}
-                `}
-              >
-                {loadingStates.basic ? 'Processing...' : 'Get Started'}
+              <span className="block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl">
+                Get Started
               </span>
             </button>
           </div>
-          
+
           {/* Advanced Plan */}
           <div className="bg-transparent md:w-1/2 w-full rounded-xl p-8 space-y-6 flex flex-col items-center justify-between border-2 border-purple-500 dark:border-purple-400 relative">
             <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -151,17 +160,19 @@ export default function PaymentsPage() {
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-2xl dark:text-gray-400 text-black">$</span>
+                <span className="text-2xl dark:text-gray-400 text-black">
+                  $
+                </span>
                 <span className="font-bold text-4xl">69</span>
-                <span className="dark:text-gray-400 text-black text-sm">/per month</span>
+                <span className="dark:text-gray-400 text-black text-sm">
+                  /per month
+                </span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center w-full">
               <div className="text-center mb-4">
                 <h1 className="font-semibold text-xl">Features</h1>
-                <p className="text-gray-400">
-                  Everything in Basic plus...
-                </p>
+                <p className="text-gray-400">Everything in Basic plus...</p>
               </div>
               <div className="w-full px-2 py-2">
                 <div className="space-y-3">
@@ -190,7 +201,13 @@ export default function PaymentsPage() {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span className={feature.highlighted ? "font-medium" : "text-gray-600 dark:text-gray-400"}>
+                      <span
+                        className={
+                          feature.highlighted
+                            ? "font-medium"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
                         {feature.text}
                       </span>
                     </div>
@@ -198,18 +215,23 @@ export default function PaymentsPage() {
                 </div>
               </div>
             </div>
+            {/* Advanced Plan Button: Payment logic here */}
             <button
-              onClick={() => buy('795919', 'advanced')}
+              onClick={() => buy("795919", "advanced")}
               disabled={loadingStates.advanced}
               className="w-40 rounded-md dark:bg-purple-500 bg-purple-600"
             >
               <span
                 className={`block -translate-x-2 -translate-y-2 rounded-md border-2 border-purple-600 dark:border-purple-400 bg-white dark:bg-black p-4 text-xl  
                   hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-                  ${loadingStates.advanced ? 'opacity-75 cursor-not-allowed' : ''}
+                  ${
+                    loadingStates.advanced
+                      ? "opacity-75 cursor-not-allowed"
+                      : ""
+                  }
                 `}
               >
-                {loadingStates.advanced ? 'Processing...' : 'Upgrade Now'}
+                {loadingStates.advanced ? "Processing..." : "Upgrade Now"}
               </span>
             </button>
           </div>
