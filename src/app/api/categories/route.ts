@@ -7,7 +7,7 @@ import RepoSummaryModel from '@/models/reposummary';
 import User from '@/models/User';
 import { getLatestReadmeContent, getReadmeContentHistory} from '@/lib/db/readmeContentService';
 
-export async function GET(
+export async function POST(
     request: NextRequest,
   ) {
     await dbconnect();
