@@ -147,7 +147,9 @@ const Dashboard = () => {
         });
 
         const result = await response.json();
+        
         if (result.success) {
+          setResponse(result.reposummary);
           console.log("REPO SUMMARY CREATED SUCCESSFULLY!!");
         } else {
           throw new Error(result.message || "Error creating repo summary");
