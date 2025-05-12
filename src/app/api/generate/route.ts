@@ -55,34 +55,34 @@ export async function POST(
     const category = await getCategory(prompt);
     console.log("Category : ", category);
 
-    let content = "";
-    switch (category) {
-      case "Readme":
-        content = await generateReadme(fullContext, prompt);
-        break;
-      case "Article":
-        content = await generateArticle(fullContext, prompt);
-        break;
-      case "Tweet":
-        content = await generateTweet(fullContext, prompt);
-        break;
-      case "LinkedIn":
-        content = await generateLinkedin(fullContext, prompt);
-        break;
-        case "Pitch":
-        content = await generatePitch(fullContext, prompt);
-        break;
-      case "ppt":
-        content = await generatePPTContent(fullContext, prompt);
-        break;
-      default:
-        content = await generatePitch(fullContext, prompt);
-    }
+    // let content = "";
+    // switch (category) {
+    //   case "Readme":
+    //     content = await generateReadme(fullContext, prompt);
+    //     break;
+    //   case "Article":
+    //     content = await generateArticle(fullContext, prompt);
+    //     break;
+    //   case "Tweet":
+    //     content = await generateTweet(fullContext, prompt);
+    //     break;
+    //   case "LinkedIn":
+    //     content = await generateLinkedin(fullContext, prompt);
+    //     break;
+    //     case "Pitch":
+    //     content = await generatePitch(fullContext, prompt);
+    //     break;
+    //   case "ppt":
+    //     content = await generatePPTContent(fullContext, prompt);
+    //     break;
+    //   default:
+    //     content = await generatePitch(fullContext, prompt);
+    // }
 
-    // Save generated content
-    await saveReadmeContent(repoUrl, userId, content, category, false);
+    // // Save generated content
+    // await saveReadmeContent(repoUrl, userId, content, category, false);
 
-    return NextResponse.json({ content }, { status: 200 });
+    // return NextResponse.json({ content }, { status: 200 });
 
   } catch (error: unknown) {
     if (error instanceof Error) {
