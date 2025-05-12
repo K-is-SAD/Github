@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import dbconnect from '@/lib/connectDatabase';
-import { deleteReadmeContent } from '@/lib/db/readmeContentService';
 import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,8 +16,6 @@ import { generatePPTContent } from '@/utils/generatePPTContent';
 interface RouteParams {
   id: string;
 }
-
-export const dynamic = 'force-dynamic'
 
 export async function POST(
   request: NextRequest,
