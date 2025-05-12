@@ -2,11 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Emulate __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const templatePath = path.resolve(__dirname, '../formats/hackathonPresentationTemplate.md');
+const templatePath = path.resolve(process.cwd(), 'src/formats/hackathonPresentationTemplate.md');
 const hackathonPresentationTemplate = fs.readFileSync(templatePath, 'utf-8');
 
 export const generatePPTSystemPrompt = `You are a presentation expert who creates well-structured, professional PowerPoint content.

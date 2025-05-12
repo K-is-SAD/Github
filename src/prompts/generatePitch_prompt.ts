@@ -2,11 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-// emulate __dirname in ES modules
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-const templatePath = path.resolve(__dirname, '../formats/pitchTemplate.txt')
+const templatePath = path.resolve(process.cwd(), 'src/formats/pitchTemplate.txt')
 //console.log(templatePath)  
 const template = fs.readFileSync(templatePath, 'utf-8');
 
