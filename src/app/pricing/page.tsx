@@ -137,8 +137,7 @@ export default function PaymentsPage() {
               </div>
             </div>
             <button
-              onClick={() => buy("795918", "basic")}
-              disabled={loadingStates.basic}
+              disabled={true}
               className="w-40 rounded-md dark:bg-white bg-black"
             >
               <span
@@ -221,7 +220,7 @@ export default function PaymentsPage() {
               </div>
             </div>
             <button
-              onClick={() => buy("795919", "advanced")}
+              onClick={() => buy("795918", "advanced")}
               disabled={loadingStates.advanced}
               className="w-40 rounded-md dark:bg-purple-500 bg-purple-600"
             >
