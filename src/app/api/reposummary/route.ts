@@ -77,7 +77,7 @@ export async function POST(
             console.log(doc);
         }); 
 
-        return NextResponse.json({success : true, message : "Repo summary saved successfully", repoSummary : JSON.stringify(repoSummary)}, {status : 200});
+        return NextResponse.json({success : true, message : "Repo summary saved successfully", repoSummary : JSON.stringify(body)}, {status : 200});
 
     } catch (error) {
         console.log("Error occurred in /api/reposummary creation", error);
