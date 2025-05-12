@@ -24,5 +24,20 @@ export const faqData: FAQItem[] = [
     id: "item-4",
     question: "How does section-based editing work?",
     answer: "When content is generated or loaded, it's automatically divided into logical sections based on markdown headings. You can edit each section independently, and changes will be reflected in the full document preview."
+  },
+  {
+    id: "item-5",
+    question: "Can Nebula process very large repositories?",
+    answer: "Due to the limitations of the API rate limits, we recommend keeping your repository size upto medium level. However, processing for large repositories will be available soon."
+  },
+  {
+    id: "item-6",
+    question: "Sometimes, the summary is not displayed on the right side due to error. What should be done?",
+    answer: "No need to worry! This is a temporary issue. Nebula has got you covered. You can still chat and generate content. The summary will be displayed once the issue is resolved."
+  },
+  {
+    id: "item-7",
+    question: "What contents can be generated?",
+    answer: "Till now, Nebula can generate content for LinkedIn, X (formerly Twitter), PowerPoint presentations, and README files, Pitch, Articles and Blogs. You just need to tell our GenBot. You can also generate content based on your own prompts. More specialized content generation options will be available soon."
   }
 ];
