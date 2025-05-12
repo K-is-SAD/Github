@@ -42,8 +42,6 @@ interface TemplateData {
 }
 
 export default function EditorPage() {
- 
-
   const [content, setContent] = useState<string>("");
   const [previewMode, setPreviewMode] = useState<boolean>(false);
   const [repository, setRepository] = useState<string>("");
@@ -70,7 +68,8 @@ export default function EditorPage() {
       posts: Array<{ _id: string; content: string; createdAt: string }>;
     }>
   >([]);
-  const [isLoadingCategories, setIsLoadingCategories] = useState<boolean>(false);
+  const [isLoadingCategories, setIsLoadingCategories] =
+    useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [showPopup, setShowPopup] = useState<boolean>(false);
@@ -113,7 +112,6 @@ export default function EditorPage() {
       setSelectedCategory(null);
     }
   }, [repoUrl]);
-
 
   const fetchRepositories = async () => {
     setIsLoadingRepos(true);
@@ -183,9 +181,7 @@ export default function EditorPage() {
   const copyContent = () => {
     navigator.clipboard
       .writeText(popupContent)
-      .then(() => {
-       
-      })
+      .then(() => {})
       .catch((err) => {
         console.error("Failed to copy: ", err);
       });
@@ -230,7 +226,6 @@ export default function EditorPage() {
 
     setGenerating(true);
     try {
-
       const apiUrl = process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL;
 
       const response = await fetch(`${apiUrl}/api/summarise`, {
@@ -244,7 +239,6 @@ export default function EditorPage() {
 
       const repoMarkdown = await convertToJSON(data.repoMarkdown);
       console.log("REPOMARKDOWN IN EDITOR \n", repoMarkdown);
-      
 
       if (response.ok) {
         setContent(data.repoMarkdown);
@@ -293,14 +287,14 @@ export default function EditorPage() {
       });
 
       const data = await response.json();
-      if(data.success){
+      if (data.success) {
         console.log("Saved content:", data.content);
         setSavedStatus(true);
       }
 
       // Show saved status
       setSavedStatus(true);
-      setTimeout(() => setSavedStatus(false), 3000);  
+      setTimeout(() => setSavedStatus(false), 3000);
     } catch (error) {
       console.error("Error saving:", error);
     } finally {
@@ -583,17 +577,16 @@ export default function EditorPage() {
                 </article>
               </div>
             )}
-
-            <div className="flex justify-between">
-              <div className="flex space-x-4">
+            <div className="flex flex-col md:flex-row justify-between gap-4">
+              {/* First group - Reset and Export */}
+              <div className="flex items-center justify-between gap-4">
                 <button
                   className="rounded-md dark:bg-white bg-black"
                   onClick={() => setContent("")}
                 >
                   <span
-                    className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
+                    className={`-translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+          hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all`}
                   >
                     <IconRefresh className="mr-1" size={16} /> Reset
                   </span>
@@ -603,50 +596,47 @@ export default function EditorPage() {
                   onClick={handleExport}
                 >
                   <span
-                    className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
+                    className={`-translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+          hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all`}
                   >
                     <IconDownload className="mr-1" size={16} /> Export
                   </span>
                 </button>
               </div>
-              <div className="space-x-4">
-              <button
-                className="rounded-md dark:bg-white bg-black"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                <span
-                  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
+
+              {/* Second group - Save and Publish */}
+              <div className="flex items-center justify-between gap-4">
+                <button
+                  className="rounded-md dark:bg-white bg-black"
+                  onClick={handleSave}
+                  disabled={saving}
                 >
-                  {saving ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <IconDeviceFloppy className="mr-1" size={16} /> Save
-                    </>
-                  )}
-                </span>
-              </button>
-              <Link href='http://localhost:3001'>
-              <button
-                className="rounded-md dark:bg-white bg-black"
-              >
-                <span
-                  className={` -translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
-                >
-                  Publish
-                </span>
-              </button>
-              </Link>
+                  <span
+                    className={`-translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+          hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all`}
+                  >
+                    {saving ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-1"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <IconDeviceFloppy className="mr-1" size={16} /> Save
+                      </>
+                    )}
+                  </span>
+                </button>
+                <Link href="https://nebula-dapp-five.vercel.app">
+                  <button className="rounded-md dark:bg-white bg-black">
+                    <span
+                      className={`-translate-x-2 -translate-y-2 flex items-center justify-between rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+            hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all`}
+                    >
+                      Publish
+                    </span>
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -656,9 +646,7 @@ export default function EditorPage() {
       {/* Content Popup Modal */}
       {showPopup && selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div
-            className="bg-white dark:bg-black rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden"
-          >
+          <div className="bg-white dark:bg-black rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] overflow-hidden">
             <div className="p-4 border-b dark:border-white border-black flex justify-between items-center">
               <h3 className="font-medium dark:text-white text-black">
                 {selectedCategory &&
@@ -718,11 +706,9 @@ export default function EditorPage() {
 
                       setShowPopup(false);
                       fetchCategories();
-                     
                     }
                   } catch (err) {
                     console.error("Error deleting all contents:", err);
-                    
                   }
                 }}
                 className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md flex items-center cursor-pointer transition-colors"

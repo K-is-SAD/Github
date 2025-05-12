@@ -1,8 +1,46 @@
-import React from "react";
+'use client'
+
+import React, { useState } from 'react'
+import axios from 'axios'
 import { features } from "@/assets/data";
 import Grid from "@/components/grids/Index";
 
-const page = () => {
+export default function PaymentsPage() {
+  const [loadingStates, setLoadingStates] = useState({
+    basic: false,
+    advanced: false
+  });
+  const [error, setError] = useState<string | null>(null)
+  
+  const buy = async (productId: string, plan: 'basic' | 'advanced') => {
+    try {
+      setLoadingStates(prev => ({...prev, [plan]: true}));
+      setError(null)
+      
+      const response = await axios.post('/api/purchaseProduct', {
+        productId: productId, 
+        customData: {
+          userId: '123', // Replace with actual user ID
+        }});
+      const data = await response.data  
+      
+      if (response.status < 200 || response.status >= 300) {
+        throw new Error(data.error || 'Failed to initiate payment')
+      }
+      
+      if (data.checkoutUrl) {
+        window.open(data.checkoutUrl, '_blank')
+      } else {
+        throw new Error('No checkout URL returned')
+      }
+    } catch (err) {
+      console.error('Payment error:', err)
+      setError(err instanceof Error ? err.message : 'An unknown error occurred')
+    } finally {
+      setLoadingStates(prev => ({...prev, [plan]: false}));
+    }
+  }
+
   return (
     <div className="w-full relative">
       <div>
@@ -11,35 +49,23 @@ const page = () => {
       <div className="absolute h-screen w-full space-y-8 items-center sm:top-24 top-28">
         <div className="flex flex-col items-center justify-center space-y-4">
           <h1 className="md:text-5xl text-2xl text-center">
-            Equip your buisness with world class software
+            Equip your business with world class software
           </h1>
 
           <h4 className="md:text-xl text-sm text-center">
-            We believe Untitled should be accesible to all companies,no matter
+            We believe Untitled should be accessible to all companies, no matter
             the size
           </h4>
         </div>
-        <div className="flex items-center justify-center space-x-6">
-          <button className="rounded-md dark:bg-white bg-black">
-            <span
-              className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
-            >
-              Watch video
-            </span>
-          </button>
-          <button className="rounded-md dark:bg-white bg-black">
-            <span
-              className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
-            >
-              Get Started
-            </span>
-          </button>
-        </div>
+        
+        {error && (
+          <div className="p-4 mb-6 bg-red-50 text-red-700 rounded-md border border-red-200 max-w-md mx-auto">
+            {error}
+          </div>
+        )}
+        
         <div className="flex md:flex-row flex-col items-center justify-center gap-8 max-w-7xl mx-auto md:px-10 px-4">
+          {/* Basic Plan */}
           <div className="bg-transparent md:w-1/2 w-full rounded-xl p-8 flex flex-col items-center justify-between space-y-6">
             <div className="flex flex-col items-center justify-center gap-y-4">
               <div className="flex flex-col items-center justify-center">
@@ -50,14 +76,9 @@ const page = () => {
               </div>
 
               <div>
-                <span className="text-2xl dark:text-gray-400 text-gray-950">
-                  {" "}
-                  $
-                </span>
+                <span className="text-2xl dark:text-gray-400 text-gray-950">$</span>
                 <span className="font-bold text-4xl">39</span>
-                <span className="dark:text-gray-400 text-gray-950 text-sm">
-                  /per month
-                </span>
+                <span className="dark:text-gray-400 text-gray-950 text-sm">/per month</span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center">
@@ -67,7 +88,7 @@ const page = () => {
                   Everything in our free plan plus...
                 </p>
               </div>
-              <div className="flex px-2 py-2 ">
+              <div className="flex px-2 py-2">
                 <div className="space-y-2">
                   {features.map((feature) => (
                     <ul key={feature.id} className="flex items-center gap-2">
@@ -94,9 +115,7 @@ const page = () => {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span
-                        className={feature.highlighted ? "font-medium" : ""}
-                      >
+                      <span className={feature.highlighted ? "font-medium" : ""}>
                         {feature.text}
                       </span>
                     </ul>
@@ -104,16 +123,23 @@ const page = () => {
                 </div>
               </div>
             </div>
-            <button className="w-40 rounded-md dark:bg-white bg-black">
+            <button
+              onClick={() => buy('795918', 'basic')}
+              disabled={loadingStates.basic}
+              className="w-40 rounded-md dark:bg-white bg-black"
+            >
               <span
                 className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                  ${loadingStates.basic ? 'opacity-75 cursor-not-allowed' : ''}
+                `}
               >
-                Get Started
+                {loadingStates.basic ? 'Processing...' : 'Get Started'}
               </span>
             </button>
           </div>
+          
+          {/* Advanced Plan */}
           <div className="bg-transparent md:w-1/2 w-full rounded-xl p-8 space-y-6 flex flex-col items-center justify-between">
             <div className="flex flex-col justify-center items-center gap-y-4">
               <div className="text-center">
@@ -123,14 +149,9 @@ const page = () => {
                 </p>
               </div>
               <div className="text-right">
-                <span className="text-2xl dark:text-gray-400 text-black">
-                  {" "}
-                  $
-                </span>
+                <span className="text-2xl dark:text-gray-400 text-black">$</span>
                 <span className="font-bold text-4xl">69</span>
-                <span className="dark:text-gray-400 text-black text-sm">
-                  /per month
-                </span>
+                <span className="dark:text-gray-400 text-black text-sm">/per month</span>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center">
@@ -140,7 +161,7 @@ const page = () => {
                   Everything in our basic plan plus...
                 </p>
               </div>
-              <div className="flex items-center justify-between px-2 py-2 ">
+              <div className="flex items-center justify-between px-2 py-2">
                 <div className="space-y-2">
                   {features.map((feature) => (
                     <ul key={feature.id} className="flex items-center gap-2">
@@ -167,9 +188,7 @@ const page = () => {
                           strokeLinejoin="round"
                         />
                       </svg>
-                      <span
-                        className={feature.highlighted ? "font-medium" : ""}
-                      >
+                      <span className={feature.highlighted ? "font-medium" : ""}>
                         {feature.text}
                       </span>
                     </ul>
@@ -177,13 +196,18 @@ const page = () => {
                 </div>
               </div>
             </div>
-            <button className="w-40 rounded-md dark:bg-white bg-black">
+            <button
+              onClick={() => buy('795919', 'advanced')}
+              disabled={loadingStates.advanced}
+              className="w-40 rounded-md dark:bg-white bg-black"
+            >
               <span
                 className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
-                hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-               `}
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                  ${loadingStates.advanced ? 'opacity-75 cursor-not-allowed' : ''}
+                `}
               >
-                Get Started
+                {loadingStates.advanced ? 'Processing...' : 'Get Started'}
               </span>
             </button>
           </div>
@@ -191,6 +215,4 @@ const page = () => {
       </div>
     </div>
   );
-};
-
-export default page;
+}
