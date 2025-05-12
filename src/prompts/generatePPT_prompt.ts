@@ -4,7 +4,7 @@ import path from 'path';
 const templatePath = path.resolve(process.cwd(), 'src/formats/hackathonPresentationTemplate.md');
 const hackathonPresentationTemplate = fs.readFileSync(templatePath, 'utf-8');
 
-export const generatePPTSystemPrompt = `You are a presentation expert who creates well-structured, professional PowerPoint content.
+export const generatePPTSystemPrompt = `You are a presentation prompt generation expert who creates well-structured, professional prompt for PowerPoint content for other llms to create .
 
 Given information about a GitHub repository, create compelling slide content for a presentation that showcases the repository to potential users or investors.
 
@@ -24,7 +24,7 @@ For each slide provide:
 - Main content points (as bullet points)
 - Any notes or talking points (prefixed with "Speaker Notes:")
 
-Format your response as structured text that can be easily parsed into slides.`;
+Format your response as structured prompt that can be easily understood by other llms to generte actual ppt`;
 
 export const generatePPTUserPrompt = `Generate PowerPoint presentation content for the GitHub repository based on the following information:
 
