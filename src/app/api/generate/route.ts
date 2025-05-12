@@ -53,6 +53,7 @@ export async function POST(
 
     // Determine category of generation
     const category = await getCategory(prompt);
+    console.log("Category : ", category);
 
     let content = "";
     switch (category) {
