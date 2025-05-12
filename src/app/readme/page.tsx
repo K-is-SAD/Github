@@ -257,7 +257,7 @@ const ReadmePage = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ repoUrl, message: input }),
+          body: JSON.stringify({ repoUrl, message: userMessage.content }),
         }
       );
 
