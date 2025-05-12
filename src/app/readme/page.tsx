@@ -180,7 +180,7 @@ const ReadmePage = () => {
     if (!selectedItem || !selectedCategory) return;
 
     try {
-      const response = await fetch(`/api/readme-content`, {
+      const response = await fetch(`/api/generate`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -251,7 +251,7 @@ const ReadmePage = () => {
 
     try {
       const response = await fetch(
-        `/api/readme-content`,
+        `/api/generate`,
         {
           method: "POST",
           headers: {
