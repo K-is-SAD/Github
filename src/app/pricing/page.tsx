@@ -136,13 +136,18 @@ export default function PaymentsPage() {
                 </div>
               </div>
             </div>
-            {/* Basic Plan Button: NO onClick */}
             <button
-              disabled
-              className="w-40 rounded-md dark:bg-white bg-black opacity-50 cursor-not-allowed"
+              onClick={() => buy("795918", "basic")}
+              disabled={loadingStates.basic}
+              className="w-40 rounded-md dark:bg-white bg-black"
             >
-              <span className="block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl">
-                Get Started
+              <span
+                className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                  ${loadingStates.basic ? "opacity-75 cursor-not-allowed" : ""}
+                `}
+              >
+                {loadingStates.basic ? "Processing..." : "Get Started"}
               </span>
             </button>
           </div>
@@ -215,7 +220,6 @@ export default function PaymentsPage() {
                 </div>
               </div>
             </div>
-            {/* Advanced Plan Button: Payment logic here */}
             <button
               onClick={() => buy("795919", "advanced")}
               disabled={loadingStates.advanced}
