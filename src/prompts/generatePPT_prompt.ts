@@ -1,6 +1,5 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 const templatePath = path.resolve(process.cwd(), 'src/formats/hackathonPresentationTemplate.md');
 const hackathonPresentationTemplate = fs.readFileSync(templatePath, 'utf-8');
