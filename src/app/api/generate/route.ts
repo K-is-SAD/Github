@@ -75,7 +75,7 @@ export async function POST(
         content = await generatePPTContent(fullContext, prompt);
         break;
       default:
-        content = await generateReadme(fullContext, prompt);
+        content = await generatePitch(fullContext, prompt);
     }
 
     // Save generated content
