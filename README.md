@@ -29,16 +29,8 @@ Nebula transforms complicated repositories into elegant documentation with AI-po
         </h3>
       </div>
       <div style="padding: 20px;">
-        <p><strong>Web3 Implementation Demo:</strong></p>
-        <a href="https://github.com/user-attachments/assets/cc7536fc-d537-4a22-a198-315105df3ff4" style="display: block; padding: 10px; background-color: rgba(0,0,0,0.02); border-radius: 5px; margin-bottom: 15px; text-decoration: none; color: inherit;">
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M21 3H3C1.9 3 1 3.9 1 5V19C1 20.1 1.9 21 3 21H21C22.1 21 23 20.1 23 19V5C23 3.9 22.1 3 21 3ZM21 19H3V5H21V19ZM9 8H11V16H9V8ZM13 8H15V16H13V8Z" fill="#6e7681"/>
-            </svg>
-            <span>View Web3 Implementation Demo</span>
-          </div>
-        </a>        <p><strong>Full Demo Video:</strong></p>
-        <a href="https://drive.google.com/file/d/1a3ZxPlgpctzU4tKBbkjsQBbFNSNb6YI5/view" style="display: block; padding: 10px; background-color: rgba(0,0,0,0.02); border-radius: 5px; margin-bottom: 15px; text-decoration: none; color: inherit;">
+        <p><strong>1. Full Demo Video:</strong></p>
+        <a href="https://youtu.be/fnYAwlWl49Y?si=yJT1uwKO7BmEvmT9" style="display: block; padding: 10px; background-color: rgba(0,0,0,0.02); border-radius: 5px; margin-bottom: 15px; text-decoration: none; color: inherit;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM10 16.5V7.5L16 12L10 16.5Z" fill="#6e7681"/>
@@ -46,8 +38,9 @@ Nebula transforms complicated repositories into elegant documentation with AI-po
             <span>View Full Demo Video</span>
           </div>
         </a>
-        <p><strong>Pitch Video:</strong></p>
-        <a href="https://github.com/user-attachments/assets/550784a7-0c56-4bb0-a4f4-ee1e94973ac9" style="display: block; padding: 10px; background-color: rgba(0,0,0,0.02); border-radius: 5px; text-decoration: none; color: inherit;">
+<p></p>
+        <p><strong>2. Pitch Video:</strong></p>
+        <a href="https://youtu.be/rfGqEo2WJPA?si=KQ0FAQy_du4p_WQs" style="display: block; padding: 10px; background-color: rgba(0,0,0,0.02); border-radius: 5px; text-decoration: none; color: inherit;">
           <div style="display: flex; align-items: center; gap: 10px;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M4 6H2V20C2 21.1 2.9 22 4 22H18V20H4V6Z M20 2H8C6.9 2 6 2.9 6 4V16C6 17.1 6.9 18 8 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H8V4H20V16ZM12 5.5V14.5L18 10L12 5.5Z" fill="#6e7681"/>
@@ -213,9 +206,7 @@ Nebula transforms complicated repositories into elegant documentation with AI-po
       <li>🔍 <strong>Increase Project Visibility:</strong> Well-documented repos attract more users and contributors</li>
     </ul>
   </div>
-  <div style="flex: 1; text-align: center;">
-    <img src="public/file.svg" alt="Nebula Documentation Process" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
-  </div>
+ 
 </div>
 
 ## 🔥 Key Features
