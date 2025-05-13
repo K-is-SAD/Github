@@ -13,6 +13,7 @@ import { generateTweet } from '@/utils/generateTweet';
 import { generateLinkedin } from '@/utils/generateLinkedin';
 import { generatePitch } from '@/utils/generatePitch';
 import { generatePPTContent } from '@/utils/generatePPTContent';
+import { generatedemandcontent } from '@/utils/generatedemandcontent';
 interface RouteParams {
   id: string;
 }
@@ -58,25 +59,50 @@ export async function POST(
     let content = "";
     switch (category) {
       case "Readme":
+      case "readme":
+      case "README":
+      case "ReadMe":
         content = await generateReadme(fullContext, prompt);
         break;
       case "Article":
+      case "Blog":
+      case "blog":
+      case "article":
+      case "Blog post":
+      case "blog post":
         content = await generateArticle(fullContext, prompt);
         break;
       case "Tweet":
+      case "tweet":
+      case "Tweet thread":
+      case "tweet thread":
+      case "Twitter":
+      case "twitter":
         content = await generateTweet(fullContext, prompt);
         break;
       case "LinkedIn":
+      case "linkedIn":
+      case "Linkedin":
+      case "linkedin":
+      case "Linked in":
         content = await generateLinkedin(fullContext, prompt);
         break;
       case "Pitch":
+      case "pitch":
+      case "Speech":
+      case "speech":
         content = await generatePitch(fullContext, prompt);
         break;
       case "ppt":
+      case "PPT":
+      case "presentation":
+      case "Presentation":
+      case "hackathon":
+      case "Hackathon":
         content = await generatePPTContent(fullContext, prompt);
         break;
       default:
-        content = await generatePitch(fullContext, prompt);
+        content = await generatedemandcontent(fullContext, prompt);
     }
 
     // Save generated content

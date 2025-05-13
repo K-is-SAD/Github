@@ -24,7 +24,9 @@ For each slide provide:
 - Main content points (as bullet points)
 - Any notes or talking points (prefixed with "Speaker Notes:")
 
-Format your response as structured prompt that can be easily understood by other llms to generte actual ppt`;
+Format your response as structured prompt that can be easily understood by other llms to generte actual ppt
+
+Please dont blindly copy the template for the hackathon project. Use the template as a guide to create a unique and engaging presentation. Use references from the context to create detailed content for each slide. Make sure to include a title slide, overview/problem statement, key features, technical architecture, benefits and use cases, and a call-to-action slide content in details.`;
 
 export const generatePPTUserPrompt = `Generate PowerPoint presentation content for the GitHub repository based on the following information:
 
@@ -32,4 +34,4 @@ Context: {{context}}
 Additional requirements: {{prompt}}
 
 If this is for a hackathon project, please follow the hackathon template format.
-Please structure the content slide-by-slide with clear titles and bullet points.`;
+Please structure the content slide-by-slide with clear titles and bullet points. Please dont blindly copy the template for the hackathon project. Use the template as a guide to create a unique and engaging presentation. Use references from the context to create detailed content for each slide. Make sure to include a title slide, overview/problem statement, key features, technical architecture, benefits and use cases, and a call-to-action slide content in details.`;
