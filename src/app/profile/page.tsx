@@ -82,19 +82,19 @@ export default function ProfilePage() {
         setActivity([
           {
             _id: "1",
-            type: "readme",
+            type: "Readme",
             title: "Generated README for project-x",
             timestamp: new Date(Date.now() - 3600000).toISOString(),
           },
           {
             _id: "2",
             type: "repository",
-            title: "Added repository user/awesome-project",
+            title: "Added repository Users/awesome-project",
             timestamp: new Date(Date.now() - 86400000).toISOString(),
           },
           {
             _id: "3",
-            type: "template",
+            type: "Template",
             title: "Created new template 'Technical Documentation'",
             timestamp: new Date(Date.now() - 172800000).toISOString(),
           },
@@ -420,7 +420,7 @@ export default function ProfilePage() {
                           <span>
                             {isConnecting ? (
                               <>
-                                Connecting...
+                                Connecting.....
                               </>
                             ) : (
                               "Connect"
