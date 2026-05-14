@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import Grid from "@/components/grids/Index";
 import {
@@ -12,7 +10,7 @@ import {
   Trash,
   X,
 } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 import Link from "next/link";
 
@@ -31,7 +29,7 @@ const ReadmePage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const [status, setStatus] = useState<"ready" | "streaming" | "submitted">(
-    "ready"
+    "ready",
   );
 
   const [showSidebar, setShowSidebar] = useState<boolean>(false);
@@ -88,6 +86,38 @@ const ReadmePage = () => {
     }
   }, [showRepoDropdown]);
 
+  const fetchCategories = useCallback(async () => {
+    setIsLoadingCategories(true);
+    try {
+      const response = await fetch(`/api/categories`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch categories: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Categories and content:", data.data);
+
+      if (data.success && data.data) {
+        setCategories(data.data);
+      } else {
+        setCategories([]);
+        console.error("Failed to fetch categories:", data.message);
+      }
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setCategories([]);
+    } finally {
+      setIsLoadingCategories(false);
+    }
+  }, [repoUrl]);
+
   useEffect(() => {
     if (repoUrl) {
       setShowSidebar(true);
@@ -97,7 +127,7 @@ const ReadmePage = () => {
       setCategories([]);
       setSelectedCategory(null);
     }
-  }, [repoUrl]);
+  }, [repoUrl, fetchCategories]);
 
   const fetchRepositories = async () => {
     setIsLoadingRepos(true);
@@ -127,16 +157,13 @@ const ReadmePage = () => {
   const fetchCategories = async () => {
     setIsLoadingCategories(true);
     try {
-      const response = await fetch(
-        `/api/categories`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body : JSON.stringify({ repoUrl }),
-        }
-      );
+      const response = await fetch(`/api/categories`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl }),
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch categories: ${response.status}`);
@@ -250,16 +277,13 @@ const ReadmePage = () => {
     setStatus("submitted");
 
     try {
-      const response = await fetch(
-        `/api/generate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ repoUrl, message: userMessage.content }),
-        }
-      );
+      const response = await fetch(`/api/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl, message: userMessage.content }),
+      });
 
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
@@ -280,7 +304,7 @@ const ReadmePage = () => {
       fetchCategories();
     } catch (err) {
       setError(
-        err instanceof Error ? err : new Error("An unknown error occurred")
+        err instanceof Error ? err : new Error("An unknown error occurred"),
       );
     } finally {
       setIsLoading(false);
@@ -448,7 +472,7 @@ const ReadmePage = () => {
               </span>
             </Link>
           </div>
-          
+
           <div className="flex-2 overflow-y-auto h-96 p-4 md:p-6 border dark:border-white border-black rounded-lg bg-transparent">
             <div>
               {messages.length === 0 ? (
@@ -595,7 +619,7 @@ const ReadmePage = () => {
                   try {
                     if (
                       window.confirm(
-                        "Are you sure you want to delete all contents for this repository? This action cannot be undone."
+                        "Are you sure you want to delete all contents for this repository? This action cannot be undone.",
                       )
                     ) {
                       const response = await fetch(`/api/delete-all-contents`, {
@@ -608,7 +632,7 @@ const ReadmePage = () => {
 
                       if (!response.ok) {
                         throw new Error(
-                          `Failed to delete all contents: ${response.status}`
+                          `Failed to delete all contents: ${response.status}`,
                         );
                       }
 

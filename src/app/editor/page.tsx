@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Grid from "@/components/grids/Index";
 import ReactMarkdown from "react-markdown";
 import { useSearchParams } from "next/navigation";
@@ -111,44 +110,7 @@ export default function EditorPage() {
     }
   }, [showRepoDropdown]);
 
-  useEffect(() => {
-    if (repoUrl) {
-      setShowSidebar(true);
-      fetchCategories();
-      setRepository(repoUrl); // Connect to existing state
-    } else {
-      setShowSidebar(false);
-      setCategories([]);
-      setSelectedCategory(null);
-    }
-  }, [repoUrl]);
-
-  const fetchRepositories = async () => {
-    setIsLoadingRepos(true);
-    try {
-      const response = await fetch(`/api/allrepos`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch repositories: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(data.data);
-
-      setRepositories(data.data || []);
-    } catch (err) {
-      console.error("Error fetching repositories:", err);
-    } finally {
-      setIsLoadingRepos(false);
-    }
-  };
-
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     setIsLoadingCategories(true);
     try {
       const response = await fetch(`/api/categories`, {
@@ -177,6 +139,43 @@ export default function EditorPage() {
       setCategories([]);
     } finally {
       setIsLoadingCategories(false);
+    }
+  }, [repoUrl]);
+
+  useEffect(() => {
+    if (repoUrl) {
+      setShowSidebar(true);
+      fetchCategories();
+      setRepository(repoUrl); // Connect to existing state
+    } else {
+      setShowSidebar(false);
+      setCategories([]);
+      setSelectedCategory(null);
+    }
+  }, [repoUrl, fetchCategories]);
+
+  const fetchRepositories = async () => {
+    setIsLoadingRepos(true);
+    try {
+      const response = await fetch(`/api/allrepos`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch repositories: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(data.data);
+
+      setRepositories(data.data || []);
+    } catch (err) {
+      console.error("Error fetching repositories:", err);
+    } finally {
+      setIsLoadingRepos(false);
     }
   };
 
