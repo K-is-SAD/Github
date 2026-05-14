@@ -9,9 +9,9 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ params: Record<string, string | string[]> }> }
 ) {
-  await dbconnect();
-
   try {
+    await dbconnect();
+
     // Resolve route parameters (required in Next.js 15)
     await params;
 

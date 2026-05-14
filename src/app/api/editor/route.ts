@@ -11,9 +11,9 @@ import { getCategory } from '@/utils/getCategory';
 export async function POST(
   request: NextRequest,
 ) {
-    await dbconnect();
-    
     try {
+                await dbconnect();
+
         const { repoUrl, content } = await request.json();
         console.log("Received repoUrl : ", repoUrl);
     

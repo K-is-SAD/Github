@@ -12,34 +12,35 @@ export async function getQueryResults(userId : string, repoUrl : string, query :
         
         const queryVector = await getEmbeddings(query);
 
+        if (!queryVector || !Array.isArray(queryVector)) {
+            console.log('No query vector generated, returning empty results.');
+            return [];
+        }
+
         const pipeline = [
             {
-                "$vectorSearch" : {
-                    "index" : "repoSummaryVectorIndex",
-                    "queryVector" : queryVector,
-                    "path" : "embeddings",
-                    "filter" : {
-                        "$and" : [
-                            {
-                                "repoUrl" : repoUrl,
-                            },
-                            {
-                                "userId" : userId,
-                            }
+                "$vectorSearch": {
+                    "index": "repoSummaryVectorIndex",
+                    "path": "embeddings",
+                    "queryVector": queryVector,
+                    "filter": {
+                        "$and": [
+                            { "repoUrl": repoUrl },
+                            { "userId": userId }
                         ]
                     },
-                    "numCandidates" : 150,
-                    "limit" : 10
+                    "numCandidates": 150
+                    ,"limit": 10
                 }
             },
             {
-                $project : {
-                    "repoUrl" : "$repoUrl",
-                    "pageContent" : "$pageContent", 
-                    "score" : { "$meta": "vectorSearchScore" }
+                $project: {
+                    "repoUrl": "$repoUrl",
+                    "pageContent": "$pageContent",
+                    "score": { "$meta": "vectorSearchScore" }
                 }
             }
-        ]
+        ];
 
         const cursor = collection.aggregate(pipeline);
         const results = await cursor.toArray();

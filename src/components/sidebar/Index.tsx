@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "../ui/sidebar";
 import {
   IconArrowLeft,
@@ -9,6 +9,7 @@ import {
   IconCopy,
   IconCheck,
   IconTrash,
+  IconDownload,
 } from "@tabler/icons-react";
 
 import { cn } from "@/lib/utils";
@@ -16,6 +17,17 @@ import ReactMarkdown from "react-markdown";
 import { convertToJSON } from "@/utils/jsonConverter";
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import { buildRepoSummaryMarkdown } from "@/utils/repoSummaryMarkdown";
+
+const emptyRepoMarkdown = {
+  files: [],
+  project_idea: "",
+  project_summary: "",
+  tech_stack: [],
+  key_features: [],
+  potential_issues: [],
+  feasibility: "",
+};
 
 const Index = () => {
   const links = [
@@ -53,7 +65,7 @@ const Index = () => {
     <div
       className={cn(
         "flex w-full flex-1 flex-col bg-transparent md:flex-row dark:bg-transparent",
-        "h-[80vh]"
+        "h-[80vh]",
       )}
     >
       <Sidebar open={open} setOpen={setOpen}>
@@ -83,6 +95,40 @@ const Dashboard = () => {
   const [analysisComplete, setAnalysisComplete] = useState(false);
   const { user, isLoaded, isSignedIn } = useUser();
 
+  useEffect(() => {
+    const loadSavedSummary = async () => {
+      if (!repoUrl.trim()) {
+        setResponse("");
+        setAnalysisComplete(false);
+        return;
+      }
+
+      try {
+        const savedResponse = await fetch(
+          `/api/reposummary?repoUrl=${encodeURIComponent(repoUrl)}`,
+          {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+          },
+        );
+
+        const savedData = await savedResponse.json();
+        if (savedData.success && savedData.repoMarkdown) {
+          setResponse(savedData.repoMarkdown);
+          setAnalysisComplete(true);
+        }
+      } catch (error) {
+        console.error("Error loading saved repo summary:", error);
+      }
+    };
+
+    const debounce = setTimeout(() => {
+      loadSavedSummary();
+    }, 400);
+
+    return () => clearTimeout(debounce);
+  }, [repoUrl]);
+
   if (!isLoaded) {
     return <div>Loading...</div>;
   }
@@ -100,6 +146,21 @@ const Dashboard = () => {
     setAnalysisComplete(false);
 
     try {
+      const existingSummaryResponse = await fetch(
+        `/api/reposummary?repoUrl=${encodeURIComponent(repoUrl)}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+
+      const existingSummaryData = await existingSummaryResponse.json();
+      if (existingSummaryData.success && existingSummaryData.repoMarkdown) {
+        setResponse(existingSummaryData.repoMarkdown);
+        setAnalysisComplete(true);
+        setIsLoading(false);
+        return;
+      }
 
       const apiUrl = process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL;
 
@@ -113,7 +174,8 @@ const Dashboard = () => {
       const data = await apiResponse.json();
       console.log(data.repoMarkdown);
 
-      const repoMarkdown = await convertToJSON(data.repoMarkdown);
+      const repoMarkdown =
+        (await convertToJSON(data.repoMarkdown)) ?? emptyRepoMarkdown;
       console.log("REPOMARKDOWN IN SIDEBAR \n", repoMarkdown);
 
       if (!apiResponse.ok) {
@@ -123,19 +185,31 @@ const Dashboard = () => {
       if (!data.success) {
         throw new Error(data.error || "Processing failed");
       } else {
-        setResponse(data.repoMarkdown);
+        const generatedMarkdown = buildRepoSummaryMarkdown({
+          repoUrl,
+          files: repoMarkdown.files ?? [],
+          projectIdea: repoMarkdown.project_idea ?? "",
+          projectSummary: repoMarkdown.project_summary ?? "",
+          techStacks: repoMarkdown.tech_stack ?? [],
+          keyFeatures: repoMarkdown.key_features ?? [],
+          potentialIssues: repoMarkdown.potential_issues ?? [],
+          feasibility: repoMarkdown.feasibility ?? "",
+        });
+
+        setResponse(generatedMarkdown);
         setAnalysisComplete(true);
 
         const body = {
           userId: user?.id,
           repoUrl: repoUrl,
-          files: repoMarkdown.files,
-          projectIdea: repoMarkdown.project_idea,
-          projectSummary: repoMarkdown.project_summary,
-          techStacks: repoMarkdown.tech_stack,
-          keyFeatures: repoMarkdown.key_features,
-          potentialIssues: repoMarkdown.potential_issues,
-          feasibility: repoMarkdown.feasibility,
+          files: repoMarkdown.files ?? [],
+          projectIdea: repoMarkdown.project_idea ?? "",
+          projectSummary: repoMarkdown.project_summary ?? "",
+          techStacks: repoMarkdown.tech_stack ?? [],
+          keyFeatures: repoMarkdown.key_features ?? [],
+          potentialIssues: repoMarkdown.potential_issues ?? [],
+          feasibility: repoMarkdown.feasibility ?? "",
+          repoMarkdown: generatedMarkdown,
         };
 
         const response = await fetch("/api/reposummary", {
@@ -147,9 +221,9 @@ const Dashboard = () => {
         });
 
         const result = await response.json();
-        
+
         if (result.success) {
-          setResponse(result.reposummary);
+          setResponse(result.repoMarkdown || generatedMarkdown);
           console.log("REPO SUMMARY CREATED SUCCESSFULLY!!");
         } else {
           throw new Error(result.message || "Error creating repo summary");
@@ -157,7 +231,7 @@ const Dashboard = () => {
       }
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
+        err instanceof Error ? err.message : "An unknown error occurred",
       );
       setResponse("");
       setAnalysisComplete(false);
@@ -205,7 +279,7 @@ const Dashboard = () => {
       setError(
         err instanceof Error
           ? err.message
-          : "An unknown error occurred during deletion"
+          : "An unknown error occurred during deletion",
       );
     } finally {
       setIsDeleting(false);
@@ -223,6 +297,20 @@ const Dashboard = () => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  };
+
+  const handleDownload = () => {
+    if (!response || response === "Processing your request...") return;
+
+    const blob = new Blob([response], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${repoUrl.replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase() || "repo-summary"}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -248,11 +336,7 @@ const Dashboard = () => {
               <span
                 className={`block -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
                   hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-                  ${
-                    isLoading || isDeleting
-                      ? "cursor-not-allowed"
-                      : ""
-                  }
+                  ${isLoading || isDeleting ? "cursor-not-allowed" : ""}
                 `}
               >
                 {isLoading ? "Analyzing..." : "Analyze Repo"}
@@ -267,11 +351,7 @@ const Dashboard = () => {
               <span
                 className={`flex items-center justify-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
                   hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
-                  ${
-                    isLoading || isDeleting
-                      ? "cursor-not-allowed"
-                      : ""
-                  }
+                  ${isLoading || isDeleting ? "cursor-not-allowed" : ""}
                   ${deleteSuccess ? "bg-green-100" : ""}
                 `}
               >
@@ -279,8 +359,8 @@ const Dashboard = () => {
                 {isDeleting
                   ? "Deleting..."
                   : deleteSuccess
-                  ? "Deleted!"
-                  : "Delete Repo"}
+                    ? "Deleted!"
+                    : "Delete Repo"}
               </span>
             </button>
           </div>
@@ -331,8 +411,27 @@ const Dashboard = () => {
                 {copied ? "Copied!" : "Copy"}
               </span>
             </button>
-            
-     
+
+            <button
+              className="rounded-md dark:bg-white bg-black"
+              onClick={handleDownload}
+              disabled={!response || response === "Processing your request..."}
+            >
+              <span
+                className={`flex items-center justify-center gap-2 -translate-x-2 -translate-y-2 rounded-md border-2 dark:border-white border-black dark:bg-black bg-white p-4 text-xl  
+                  hover:-translate-y-3 active:translate-x-0 active:translate-y-0 transition-all
+                ${
+                  !response || response === "Processing your request..."
+                    ? "cursor-not-allowed"
+                    : ""
+                }
+              `}
+              >
+                <IconDownload size={20} />
+                Download
+              </span>
+            </button>
+
             {analysisComplete && (
               <Link
                 href={"/chat"}

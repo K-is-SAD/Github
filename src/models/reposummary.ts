@@ -22,6 +22,7 @@ export interface RepoSummary extends Document{
     keyFeatures : string[],
     potentialIssues : string[],
     feasibility : string,
+    repoMarkdown?: string,
 }
 
 const RepoSummarySchema : Schema<RepoSummary> = new Schema({
@@ -40,6 +41,7 @@ const RepoSummarySchema : Schema<RepoSummary> = new Schema({
     keyFeatures : [{type : String , required : true}],
     potentialIssues : [{type : String, required : true}],
     feasibility : {type : String, required : true},
+    repoMarkdown : {type : String, required : false},
 },  {
     timestamps : true
 })

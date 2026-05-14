@@ -10,9 +10,9 @@ import { getLatestReadmeContent, getReadmeContentHistory} from '@/lib/db/readmeC
 export async function POST(
     request: NextRequest,
   ) {
-    await dbconnect();
-  
     try {
+      await dbconnect();
+
       const {repoUrl} = await request.json();
   
       // Authenticate user

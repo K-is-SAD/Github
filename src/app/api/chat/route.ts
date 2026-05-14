@@ -17,9 +17,9 @@ export const maxDuration = 30;
 export async function POST(
   request: NextRequest,
 ) {
-  await dbconnect();
-
   try {
+    await dbconnect();
+
     const { messages, repoUrl } = await request.json();
     console.log(messages[messages.length-1].content);
 

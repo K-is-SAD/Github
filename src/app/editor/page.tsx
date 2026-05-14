@@ -24,6 +24,16 @@ import {
   X,
 } from "lucide-react";
 import { convertToJSON } from "@/utils/jsonConverter";
+
+const emptyRepoMarkdown = {
+  files: [],
+  project_idea: "",
+  project_summary: "",
+  tech_stack: [],
+  key_features: [],
+  potential_issues: [],
+  feasibility: "",
+};
 import Link from "next/link";
 
 interface Section {
@@ -141,16 +151,13 @@ export default function EditorPage() {
   const fetchCategories = async () => {
     setIsLoadingCategories(true);
     try {
-      const response = await fetch(
-        `/api/categories`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body : JSON.stringify({ repoUrl }),
-        }
-      );
+      const response = await fetch(`/api/categories`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ repoUrl }),
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch categories: ${response.status}`);
@@ -238,7 +245,8 @@ export default function EditorPage() {
       const data = await response.json();
       console.log(data.repoMarkdown);
 
-      const repoMarkdown = await convertToJSON(data.repoMarkdown);
+      const repoMarkdown =
+        (await convertToJSON(data.repoMarkdown)) ?? emptyRepoMarkdown;
       console.log("REPOMARKDOWN IN EDITOR \n", repoMarkdown);
 
       if (response.ok) {
@@ -251,7 +259,7 @@ export default function EditorPage() {
         }
 
         const sectionMatches = data.repoMarkdown.match(
-          /^## (.*?)$([\s\S]*?)(?=^## |\Z)/gm
+          /^## (.*?)$([\s\S]*?)(?=^## |\Z)/gm,
         );
         if (sectionMatches && sectionMatches.length > 0) {
           const extractedSections = sectionMatches.map(
@@ -264,7 +272,7 @@ export default function EditorPage() {
                 content,
                 order: index,
               };
-            }
+            },
           );
           setSections(extractedSections);
         }
@@ -688,7 +696,7 @@ export default function EditorPage() {
                   try {
                     if (
                       window.confirm(
-                        "Are you sure you want to delete all contents for this repository? This action cannot be undone."
+                        "Are you sure you want to delete all contents for this repository? This action cannot be undone.",
                       )
                     ) {
                       const response = await fetch(`/api/delete-all-contents`, {
@@ -701,7 +709,7 @@ export default function EditorPage() {
 
                       if (!response.ok) {
                         throw new Error(
-                          `Failed to delete all contents: ${response.status}`
+                          `Failed to delete all contents: ${response.status}`,
                         );
                       }
 

@@ -21,9 +21,9 @@ interface RouteParams {
 export async function POST(
   request: NextRequest,
 ) {
-  await dbconnect();
-
   try {
+    await dbconnect();
+
     const { repoUrl, message } = await request.json();
     const prompt = message;
 

@@ -12,9 +12,9 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function DELETE(
   request: NextRequest,
 ) {
-  await dbconnect();
-
   try {
+    await dbconnect();
+
     const { repoUrl } = await request.json();
     
     console.log("Received repoUrl : ", repoUrl);

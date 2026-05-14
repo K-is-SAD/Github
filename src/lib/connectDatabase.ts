@@ -17,9 +17,11 @@ async function dbconnect():Promise<void>{
         connection.isconnected = db.connections[0].readyState;
         console.log("Connected to MongoDB database");
     } catch (error : any) {
-        console.log("Something went wrong!");
-        console.log(error.message);
-        process.exit(1);
+        const message = error instanceof Error ? error.message : String(error);
+        console.error("MongoDB connection failed:", message);
+        throw new Error(
+            `Failed to connect to MongoDB. ${message}. If you are using a mongodb+srv URI, verify DNS/SRV access or switch to the standard MongoDB connection string.`
+        );
     }
 }
 
