@@ -182,10 +182,10 @@ export async function deleteReadmeContent(repoUrl: string, userId : string, cont
       }
     }
 
-    const updatedcontent = await ReadmeContent.updateOne(
+    const updatedcontent = await ReadmeContent.findOneAndUpdate(
       { repoUrl : repoUrl, userId : userId },
       { $pull: { posts: { content : content } } },
-      { new: true }
+      { returnDocument: 'after' }
     )
 
     if(!updatedcontent){

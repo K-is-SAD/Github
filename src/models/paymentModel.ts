@@ -13,14 +13,12 @@ export interface PaymentDocument extends Document {
 const PaymentSchema = new Schema<PaymentDocument>(
   {
     userId: { type: String, required: true },
-    amount: { type: Number, required: false },
-    currency: { type: String, required: false },
-    status: { type: String, required: false },
-    transactionId: { type: String, required: false },
+    amount: { type: Number },
+    currency: { type: String },
+    status: { type: String },
+    transactionId: { type: String },
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
 const PaymentModel =
