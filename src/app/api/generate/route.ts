@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import dbconnect from '@/lib/connectDatabase';
 import User from '@/models/User';
 import { auth } from '@clerk/nextjs/server';
@@ -14,10 +12,6 @@ import { generateLinkedin } from '@/utils/generateLinkedin';
 import { generatePitch } from '@/utils/generatePitch';
 import { generatePPTContent } from '@/utils/generatePPTContent';
 import { generatedemandcontent } from '@/utils/generatedemandcontent';
-interface RouteParams {
-  id: string;
-}
-
 export async function POST(
   request: NextRequest,
 ) {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest, NextResponse } from 'next/server';
 import dbconnect from '@/lib/connectDatabase';
 import { auth } from '@clerk/nextjs/server';
@@ -50,12 +48,12 @@ export async function POST(
         
         return NextResponse.json({success : true, message : result.message, content : result.data}, { status: 200 });
     
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (error instanceof Error) {
         console.error(`Error in POST /api/editor:`, error);
         return NextResponse.json({ success : false, error: error.message }, { status: 500 });
         }
         console.error(`Error in POST /api/editor:`, error);
-        return NextResponse.json({success: false, error: error.message }, { status: 500 });
+        return NextResponse.json({success: false, error: 'An unknown error occurred' }, { status: 500 });
     }
 }

@@ -27,7 +27,6 @@ const ReadmePage = () => {
   >([]);
   const [input, setInput] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
   const [status, setStatus] = useState<"ready" | "streaming" | "submitted">(
     "ready",
   );
@@ -154,38 +153,6 @@ const ReadmePage = () => {
     }
   };
 
-  const fetchCategories = async () => {
-    setIsLoadingCategories(true);
-    try {
-      const response = await fetch(`/api/categories`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ repoUrl }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch categories: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log("Categories and content:", data.data);
-
-      if (data.success && data.data) {
-        setCategories(data.data);
-      } else {
-        setCategories([]);
-        console.error("Failed to fetch categories:", data.message);
-      }
-    } catch (err) {
-      console.error("Error fetching categories:", err);
-      setCategories([]);
-    } finally {
-      setIsLoadingCategories(false);
-    }
-  };
-
   const openContentPopup = (postId: string, content: string) => {
     setSelectedItem({ id: postId, content });
     setPopupContent(content);
@@ -234,10 +201,6 @@ const ReadmePage = () => {
     setInput(e.target.value);
   };
 
-  const handleRepoInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRepoUrl(e.target.value);
-  };
-
   const selectRepository = (url: string) => {
     setRepoUrl(url);
     setShowRepoDropdown(false);
@@ -246,18 +209,6 @@ const ReadmePage = () => {
 
   const selectCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
-  };
-
-  const stop = () => {
-    setIsLoading(false);
-    setStatus("ready");
-  };
-
-  const reload = async () => {
-    setError(null);
-    await handleSubmit({
-      preventDefault: () => {},
-    } as React.FormEvent<HTMLFormElement>);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -303,7 +254,8 @@ const ReadmePage = () => {
 
       fetchCategories();
     } catch (err) {
-      setError(
+      console.error(
+        "Generation failed:",
         err instanceof Error ? err : new Error("An unknown error occurred"),
       );
     } finally {
@@ -544,7 +496,9 @@ const ReadmePage = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
-                      handleSubmit(e as any);
+                      void handleSubmit(
+                        e as unknown as React.FormEvent<HTMLFormElement>,
+                      );
                     }
                   }}
                 />

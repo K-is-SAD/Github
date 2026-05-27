@@ -2,10 +2,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Grid from "@/components/grids/Index";
 import ReactMarkdown from "react-markdown";
-import { useSearchParams } from "next/navigation";
 import {
   IconRefresh,
-  IconBrandGithub,
   IconEye,
   IconCode,
   IconDeviceFloppy,
@@ -17,22 +15,10 @@ import {
   Copy,
   FilePlus,
   Folder,
-  Send,
   Trash,
   Github,
   X,
 } from "lucide-react";
-import { convertToJSON } from "@/utils/jsonConverter";
-
-const emptyRepoMarkdown = {
-  files: [],
-  project_idea: "",
-  project_summary: "",
-  tech_stack: [],
-  key_features: [],
-  potential_issues: [],
-  feasibility: "",
-};
 import Link from "next/link";
 
 interface Section {
@@ -43,23 +29,13 @@ interface Section {
   defaultContent?: string;
 }
 
-interface TemplateData {
-  _id: string;
-  name: string;
-  description: string;
-  sections: Section[];
-}
-
 export default function EditorPage() {
   const [content, setContent] = useState<string>("");
   const [previewMode, setPreviewMode] = useState<boolean>(false);
-  const [repository, setRepository] = useState<string>("");
-  const [generating, setGenerating] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [savedStatus, setSavedStatus] = useState<boolean>(false);
   const [sections, setSections] = useState<Section[]>([]);
-  const [activeSection, setActiveSection] = useState<number>(0);
-  const [templateData, setTemplateData] = useState<TemplateData | null>(null);
+  const [activeSection] = useState<number>(0);
   const [title, setTitle] = useState<string>("Untitled Document");
 
   // New state for repository dropdown and sidebar
@@ -146,7 +122,6 @@ export default function EditorPage() {
     if (repoUrl) {
       setShowSidebar(true);
       fetchCategories();
-      setRepository(repoUrl); // Connect to existing state
     } else {
       setShowSidebar(false);
       setCategories([]);
@@ -219,68 +194,12 @@ export default function EditorPage() {
 
   const selectRepository = (url: string) => {
     setRepoUrl(url);
-    setRepository(url); // Update both states
     setShowRepoDropdown(false);
     setShowRepoInput(false);
   };
 
   const selectCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
-  };
-
-  const handleGenerate = async () => {
-    if (!repository) return;
-
-    setGenerating(true);
-    try {
-      const apiUrl = process.env.NEXT_PUBLIC_PYTHON_BACKEND_URL;
-
-      const response = await fetch(`${apiUrl}/api/summarise`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ github_repo_url: repository }),
-      });
-
-      const data = await response.json();
-      console.log(data.repoMarkdown);
-
-      const repoMarkdown =
-        (await convertToJSON(data.repoMarkdown)) ?? emptyRepoMarkdown;
-      console.log("REPOMARKDOWN IN EDITOR \n", repoMarkdown);
-
-      if (response.ok) {
-        setContent(data.repoMarkdown);
-
-        // Extract sections if possible
-        const titleMatch = data.repoMarkdown.match(/^# (.*?)$/m);
-        if (titleMatch) {
-          setTitle(titleMatch[1]);
-        }
-
-        const sectionMatches = data.repoMarkdown.match(
-          /^## (.*?)$([\s\S]*?)(?=^## |\Z)/gm,
-        );
-        if (sectionMatches && sectionMatches.length > 0) {
-          const extractedSections = sectionMatches.map(
-            (section: string | undefined, index: number) => {
-              const titleMatch = (section ?? "").match(/^## (.*?)$/m);
-              const title = titleMatch ? titleMatch[1] : `Section ${index + 1}`;
-              const content = (section ?? "").replace(/^## .*?$/m, "").trim();
-              return {
-                title,
-                content,
-                order: index,
-              };
-            },
-          );
-          setSections(extractedSections);
-        }
-      }
-    } catch (error) {
-      console.error("Generation failed:", error);
-    } finally {
-      setGenerating(false);
-    }
   };
 
   const handleSave = async () => {
@@ -367,8 +286,7 @@ export default function EditorPage() {
               placeholder="Document Title"
             />
             <p className="text-black dark:text-white">
-              {templateData?.description ||
-                "Create and edit markdown content for your documentation"}
+              Create and edit markdown content for your documentation
             </p>
           </div>
         </div>
@@ -498,15 +416,14 @@ export default function EditorPage() {
               <div className="flex items-center mb-4">
                 <div className="px-3 py-1 dark:bg-black bg-white backdrop-blur-md rounded-full text-sm flex items-center">
                   <span className="truncate max-w-[200px]">{repoUrl}</span>
-                  <button
-                    className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                    onClick={() => {
-                      setRepoUrl("");
-                      setRepository("");
-                    }}
-                  >
-                    ×
-                  </button>
+                    <button
+                      className="ml-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      onClick={() => {
+                        setRepoUrl("");
+                      }}
+                    >
+                      ×
+                    </button>
                 </div>
               </div>
             )}

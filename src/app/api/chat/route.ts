@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import dbconnect from '@/lib/connectDatabase';
 import { getQueryResults } from '@/lib/db/vectorSearch';
 import { initialiseVectorIndex } from '@/lib/dbutils/vector-index';
@@ -104,9 +102,10 @@ export async function POST(
       }
     });
 
-  } catch (error : any) {
+  } catch (error: unknown) {
     console.error('Error in POST request to /api/chat:', error);
-    return NextResponse.json({success: false, message : error.message}, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    return NextResponse.json({success: false, message : errorMessage}, { status: 500 });
   }
 
 }

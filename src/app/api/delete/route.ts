@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import dbconnect from '@/lib/connectDatabase';
 import { deleteReadmeContent } from '@/lib/db/readmeContentService';
 import User from '@/models/User';
@@ -40,7 +38,7 @@ export async function DELETE(
 
     return NextResponse.json({success : true, message : result.message, content : result.data}, { status: 200 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(`Error in DELETE /api/readme-content:`, error);
       return NextResponse.json({ error: error.message }, { status: 500 });
