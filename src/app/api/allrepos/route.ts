@@ -6,14 +6,10 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ params: Record<string, string | string[]> }> }
+  request: NextRequest
 ) {
   try {
     await dbconnect();
-
-    // Resolve route parameters (required in Next.js 15)
-    await params;
 
     const { userId }: { userId: string | null | undefined } = await auth();
     

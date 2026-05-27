@@ -2,7 +2,7 @@ import dbconnect from "@/lib/connectDatabase";
 import User from "@/models/User";
 import RepoSummaryModel from "@/models/reposummary";
 import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 import { generateEmbeddings } from "@/lib/db/generateEmbeddings";
 import { initialiseVectorIndex } from "@/lib/dbutils/vector-index";
 import { getQueryResults } from "@/lib/db/vectorSearch";
